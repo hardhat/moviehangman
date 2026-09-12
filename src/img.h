@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Dale Wick
 // SPDX-License-Identifier: MIT
-// See LICENSE.md for the full license text.
+// See LICENSE for the full license text.
 
 #ifndef IMG_H
 #define IMG_H
