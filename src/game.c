@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -37,46 +38,49 @@ void draw_available_letter_tile(uint8_t index, uint8_t tile)
 
 void show_movie(void)
 {
-    // First word wrap the movie name.
+    // Word wrap the movie name into up to 3 centered lines.
     size_t len=strlen(phrase);
     uint8_t line[3]={0}; // length of each line. Assertion words can fit in 3 lines or less.
     uint8_t active_line=0;
     uint8_t line_start[3]={0}; // Tracks the starting index of each line.
-    uint8_t last_word_end=0;    // save where on the line we were, to handle word wrapping correctly.
     uint8_t max_line=0; // Tracks the maximum line length for centering.
-    uint8_t line_count; // The number of active lines filled in
+    uint8_t line_count=1; // The number of active lines filled in
 
-    // Now build a list of lines word-wrapped within the 3-line limit.
-    for(uint8_t i=0;i<len;i++) {
-        if(phrase[i]==' ') {
-            if(i-line_start[active_line]>14) {
-                if(active_line>=3) break; // Prevent exceeding the 3-line limit.
-                if(i-line_start[active_line]>max_line) max_line=i-line_start[active_line];
-                line[active_line]=i-line_start[active_line];
+    uint8_t word_start=0; // Start index of the word currently being scanned.
+    uint8_t cur_len=0;    // Length of content accumulated on the current line so far.
 
-                active_line++;
-                line_start[active_line]=last_word_end;
+    // Walk the phrase a word at a time (a word ends at a space or the end of the string),
+    // only wrapping to a new line when the word being added would overflow the current one.
+    for(uint8_t i=0;i<=len;i++) {
+        if(i==len || phrase[i]==' ') {
+            uint8_t word_len=i-word_start;
+            uint8_t sep=(cur_len>0)?1:0; // space needed before this word if the line isn't empty
+            if(cur_len>0 && line_count<3 && cur_len+sep+word_len>12) {
+                line[line_count-1]=cur_len;
+                if(cur_len>max_line) max_line=cur_len;
+                line_count++;
+                line_start[line_count-1]=word_start;
+                cur_len=word_len;
+            } else {
+                cur_len+=sep+word_len;
             }
-            last_word_end=i+1;
+            word_start=i+1;
         }
     }
-    // Grab last word of the phrase if it wasn't followed by a space.
-    if(len - line_start[active_line] > 0) {
-        if(len - line_start[active_line] > max_line) max_line = len - line_start[active_line];
-        line[active_line] = len - line_start[active_line];
-    }
+    // Finalize the last line.
+    line[line_count-1]=cur_len;
+    if(cur_len>max_line) max_line=cur_len;
 
     debug_logf("Phrase length: %d", len);
-    debug_logf("Active line: %d", active_line);
+    debug_logf("Line count: %d", line_count);
     debug_logf("Line start indices: %d, %d, %d", line_start[0], line_start[1], line_start[2]);
     debug_logf("Line lengths: %d, %d, %d", line[0], line[1], line[2]);
     debug_logf("Max line length: %d", max_line);
 
     // Calculate where the centered tiles should go
-    line_count=active_line+1;
-    uint8_t left = 20-(max_line*3)/2;
+    uint8_t left = 19-(max_line*3)/2;
     uint8_t original_left = left;
-    uint8_t top = 9-(line_count*3)/2;
+    uint8_t top = 8-(line_count*3)/2;
     clue_count=0;
     // Now draw the tiles for the 1, 2 or 3 lines:
     for(active_line=0;active_line<line_count;active_line++) {
@@ -108,12 +112,25 @@ void show_movie(void)
             draw_available_letter_tile(i, letter_available[i]?TILE_AVAILABLE_LETTER:TILE_USED_LETTER);
         }
     }
+
+    // Show the year in row 4, column 8
+    if(movie_year > 0) {
+        char year_str[16];
+        sprintf(year_str, "%04d", movie_year);
+        debug_log(year_str);
+        for(uint8_t i=0;i<strlen(year_str);i++) {
+            add_sprite(TILE_NUMBER+year_str[i]-'0', 8*16+i*16, 4*16, 0);
+            debug_logf("Added sprite for year digit: %c at position %d", year_str[i], i);
+        }
+    }
+    gfx_sprite_render_array(&ctx, 0, sprites, next_sprite);
 }
 
 void game_handle_input(uint8_t input, bool pressed)
 {
-    if(phrase[0]==0) {
+    if(phrase[0]==0 || (input==INPUT_START && !pressed)) {
         // Time to pick a phrase after any input
+        if(input==INPUT_START && !pressed) game_reset();
         uint8_t index = rand() % movies_count;
         debug_logf("Selected movie index: %d", index);
         strncpy((char*)phrase, movies[index].title, sizeof(phrase));
