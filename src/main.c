@@ -15,48 +15,16 @@
 #include <zos_video.h>
 #include <zvb_gfx.h>
 #include <zvb_sound.h>
+//#include <zvb_timer.h>
 
+#include "main.h"
 #include "img.h"
-
-enum INPUT
-{
-    INPUT_UP,
-    INPUT_DOWN,
-    INPUT_LEFT,
-    INPUT_RIGHT,
-    INPUT_A,
-    INPUT_B,
-    INPUT_X,
-    INPUT_Y,
-    INPUT_START,
-    INPUT_SELECT,
-    INPUT_L,
-    INPUT_R,
-    MAX_INPUT
-};
+#include "game.h"
 
 gfx_context ctx;
 bool done=false;
 
 #define SCREEN_PALETTE_BASE 0x0000
-const uint16_t screen_palette[16]={
-    (uint16_t)RGB888_TO_RGB565(0x3a, 0x25, 0x25), // 0  Dark brown - outlines
-    (uint16_t)RGB888_TO_RGB565(0xff, 0xff, 0xff), // 1  White - clouds/highlights
-    (uint16_t)RGB888_TO_RGB565(0x6f, 0xd4, 0xed), // 2  Sky blue - background
-    (uint16_t)RGB888_TO_RGB565(0xb8, 0xec, 0xf5), // 3  Light cyan - sky highlights
-    (uint16_t)RGB888_TO_RGB565(0x08, 0x8f, 0xd1), // 4  Dark blue - UI shadows
-    (uint16_t)RGB888_TO_RGB565(0x13, 0xb5, 0xe8), // 5  Bright blue - buttons
-    (uint16_t)RGB888_TO_RGB565(0x32, 0xc1, 0x70), // 6  Green - grass
-    (uint16_t)RGB888_TO_RGB565(0x16, 0x9b, 0x55), // 7  Dark green - foliage
-    (uint16_t)RGB888_TO_RGB565(0xff, 0xd3, 0x43), // 8  Yellow - stars/score
-    (uint16_t)RGB888_TO_RGB565(0xff, 0x98, 0x18), // 9  Orange - buttons/highlights
-    (uint16_t)RGB888_TO_RGB565(0xf2, 0x5b, 0x2a), // 10 Red-orange - danger
-    (uint16_t)RGB888_TO_RGB565(0xb8, 0x6b, 0x32), // 11 Brown - wood/earth
-    (uint16_t)RGB888_TO_RGB565(0x73, 0x3d, 0x2c), // 12 Dark brown - deep earth/shadows
-    (uint16_t)RGB888_TO_RGB565(0xf0, 0x6f, 0xa8), // 13 Pink - character accents
-    (uint16_t)RGB888_TO_RGB565(0x8e, 0x65, 0xc9), // 14 Purple - special UI
-    (uint16_t)RGB888_TO_RGB565(0xff, 0xd9, 0x9b), // 15 Cream/skin - character
-};
 
 gfx_sprite sprites[128];
 uint8_t next_sprite = 0;
@@ -103,12 +71,7 @@ void init_graphics()
 
 void send_input(uint8_t input, bool pressed)
 {
-    if(input==MAX_INPUT) {
-        done=true;
-        return;
-    }
-    if(pressed)
-        return;
+    game_handle_input(input, pressed);
 }
 
 uint8_t handle_input(uint8_t key)
@@ -195,10 +158,24 @@ int main(int argc, char *argv[])
     void* arg = (void*) (KB_READ_NON_BLOCK | KB_MODE_RAW);
     ioctl(DEV_STDIN, KB_CMD_SET_MODE, arg);
 
+    game_reset();
+    // Set the initial time to 0
+    zos_time_t delta;
+    delta.t_millis = 0;
+    settime(0,&delta);
     // Main loop
     while (!done) {
         // Poll the keyboard for input
+        gfx_wait_end_vblank(&ctx);
         process_input();
+        //gettime(0,&delta);
+        uint16_t elapsed = 16; //delta.t_millis;
+        //if(elapsed==0) elapsed=16;
+        //delta.t_millis = 0; // Reset the delta time for the next frame
+        //settime(0,&delta);
+        game_update(elapsed); // Use the actual elapsed time since the last frame
+        gfx_wait_vblank(&ctx);
+        game_draw();
     }
 
     zvb_sound_reset();

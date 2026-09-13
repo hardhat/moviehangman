@@ -1,7 +1,7 @@
 ZOS_PATH ?= ../Zeal-8-bit-OS
 ZVB_SDK_PATH ?= ../Zeal-VideoBoard-SDK
 BIN=bin/cylix.bin
-OBJ=obj/main.rel obj/img.rel obj/movies.rel #obj/game.rel obj/menu.rel
+OBJ=obj/main.rel obj/img.rel obj/movies.rel obj/game.rel #obj/menu.rel
 IMG=img/tileset.zts
 MAP=map/background.ztm map/letterclue.ztm map/text.ztm
 CC=sdcc
@@ -45,9 +45,9 @@ map/text.ztm: map/main.tmx
 	$(ZVB_SDK_PATH)/tools/tiled2zeal/tiled2zeal.py -i $< -o $@ -l 3
 
 
-#obj/game.rel: src/game.c src/game.h src/main.h src/sin88.h
+obj/game.rel: src/game.c src/game.h src/main.h src/movies.h
 #obj/menu.rel: src/menu.c src/menu.h src/game.h
-obj/main.rel: src/main.c #src/game.h src/menu.h src/img.h
+obj/main.rel: src/main.c src/img.h src/game.h #src/menu.h
 obj/img.rel: src/img.asm $(IMG) $(MAP)
 obj/movies.rel: src/movies.c src/movies.h
 
