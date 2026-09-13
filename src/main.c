@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdarg.h>
 
 #include <zos_sys.h>
 #include <zos_keyboard.h>
@@ -21,6 +22,15 @@
 #include "img.h"
 #include "game.h"
 
+#ifndef __SDCC_VERSION_MAJOR
+#define __at(addr)
+#define __naked
+#define __sfr
+#define va_list struct {int dummy; }
+#define va_start(ap, last)
+#define va_end(ap)
+#endif
+
 gfx_context ctx;
 bool done=false;
 
@@ -29,8 +39,35 @@ bool done=false;
 gfx_sprite sprites[128];
 uint8_t next_sprite = 0;
 
+zos_dev_t ser;
+
+void debug_log(const char *message)
+{
+    size_t size=strlen(message);
+
+    write(ser, message, &size);
+    size=2;
+    write(ser, "\r\n", &size);
+}
+
+void debug_logf(const char *format, ...)
+{
+    char buffer[256];
+    va_list args;
+    va_start(args, format);
+    vsprintf(buffer, format, args);
+    va_end(args);
+    debug_log(buffer);
+}
+
 void init_graphics()
 {
+    ser = open("#SER0",O_WRONLY);
+    if (ser < 0) {
+        printf("Failed to open serial port\n");
+	    exit(1);
+    }
+    debug_log("Initializing...");
     // Initialize the graphics context
     // Set to tiled 640x480 mode
     gfx_initialize(ZVB_CTRL_VID_MODE_GFX_640_8BIT, &ctx);
@@ -67,6 +104,7 @@ void init_graphics()
         .pal_offset = SCREEN_PALETTE_BASE,
     };
     gfx_tileset_load(&ctx, tileset_tiles, tileset_tiles_len, &options1);
+    debug_log("Graphics initialized.");
 }
 
 void send_input(uint8_t input, bool pressed)

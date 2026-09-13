@@ -60,6 +60,17 @@ void show_movie(void)
             last_word_end=i+1;
         }
     }
+    // Grab last word of the phrase if it wasn't followed by a space.
+    if(len - line_start[active_line] > 0) {
+        if(len - line_start[active_line] > max_line) max_line = len - line_start[active_line];
+        line[active_line] = len - line_start[active_line];
+    }
+
+    debug_logf("Phrase length: %d", len);
+    debug_logf("Active line: %d", active_line);
+    debug_logf("Line start indices: %d, %d, %d", line_start[0], line_start[1], line_start[2]);
+    debug_logf("Line lengths: %d, %d, %d", line[0], line[1], line[2]);
+    debug_logf("Max line length: %d", max_line);
 
     // Calculate where the centered tiles should go
     line_count=active_line+1;
@@ -89,6 +100,8 @@ void show_movie(void)
         left=original_left;
         top+=3;
     }
+    debug_logf("Clue count after drawing: %d", clue_count);
+
     cursor=0;
     for(int i=0;i<26;i++) {
         if(i!=cursor) {
@@ -102,8 +115,11 @@ void game_handle_input(uint8_t input, bool pressed)
     if(phrase[0]==0) {
         // Time to pick a phrase after any input
         uint8_t index = rand() % movies_count;
+        debug_logf("Selected movie index: %d", index);
         strncpy((char*)phrase, movies[index].title, sizeof(phrase));
+        debug_logf("Selected movie title: %s", phrase);
         movie_year = movies[index].year;
+        debug_logf("Selected movie year: %d", movie_year);
         show_movie();
         return;
     }

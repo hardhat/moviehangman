@@ -52,4 +52,8 @@ extern gfx_context ctx;
 extern gfx_sprite sprites[128];
 extern uint8_t next_sprite;
 
+void debug_log(const char *message);
+void debug_logf(const char *format, ...);
+
+
 #endif // MAIN_H
