@@ -14,12 +14,23 @@ uint8_t letter_available[26]; // Tracks which letters are available for guessing
 uint8_t letter_count = 0;
 uint8_t cursor = 0; // Tracks which letter is highlighted for the current round.
 // Track the letters in the current phrase.
+#define CLUE_COUNT 32
 struct Clue {
     char letter; // The letter for this clue.
     uint8_t sprite_index;   // 255 (if unsolved) or the sprite index of the letter clue.
     uint8_t x,y;    // In tiles, where the 3x3 letter clue is positioned.
-} clue[32];
+} clue[CLUE_COUNT];
 uint8_t clue_count = 0; // Tracks the number of clues in the current phrase.
+#define ANIMATED_LETTER_COUNT 32
+#define ANIMATED_SPEED 10
+struct AnimatedLetter {
+    char letter; // The letter for this animated clue
+    uint8_t sprite_index;   // The sprite index of the animated letter clue or 255 if inactive.
+    uint16_t target_x,target_y;    // In pixels, where the 3x3 letter clue is positioned.
+    int16_t delta;
+    int16_t delta_x,delta_y;
+    int8_t step_x,step_y;
+} animated_letter[ANIMATED_LETTER_COUNT];
 
 uint8_t add_sprite(uint8_t tile, uint16_t x, uint16_t y,uint8_t flags)
 {
@@ -126,6 +137,42 @@ void show_movie(void)
     gfx_sprite_render_array(&ctx, 0, sprites, next_sprite);
 }
 
+void animate_clue_tile_solution(struct Clue *clue_tile)
+{
+    // Find an available animated letter slot and initialize it for the clue tile solution.
+    uint8_t i;
+    for(i = 0; i < ANIMATED_LETTER_COUNT; i++) {
+        if(animated_letter[i].sprite_index == 255) break;
+    }
+    if(i==ANIMATED_LETTER_COUNT) return; // animation overflow
+    animated_letter[i].letter = clue_tile->letter;
+    uint8_t index = clue_tile->letter-'A';
+    // Start position for the animated letter sprite on the selection grid
+    animated_letter[i].sprite_index = add_sprite(TILE_ALPHABET+clue_tile->letter-'A', 
+        ((index%7)*2+3)*16+16, 
+        ((index/7)*2+22)*16+16,
+        0);
+    animated_letter[i].target_x = clue_tile->x*16+32;
+    animated_letter[i].target_y = clue_tile->y*16+32;
+    uint8_t sprite_index = animated_letter[i].sprite_index;
+    int16_t dx = animated_letter[i].target_x-sprites[sprite_index].x;
+    int16_t dy = animated_letter[i].target_y-sprites[sprite_index].y;
+    animated_letter[i].delta_x = dx<0?-dx:dx;
+    animated_letter[i].delta_y = dy<0?dy:-dy;
+    animated_letter[i].step_x = dx<0?-1:1;
+    animated_letter[i].step_y = dy<0?-1:1;
+    animated_letter[i].delta = animated_letter[i].delta_x+animated_letter[i].delta_y;
+
+    uint8_t left = clue_tile->x;
+    uint8_t top = clue_tile->y;
+    uint8_t tiles0[3]={TILE_CLUE_HIGHLIGHT,TILE_CLUE_HIGHLIGHT+1,TILE_CLUE_HIGHLIGHT+2};
+    gfx_tilemap_load(&ctx,tiles0,3,1,left,top);
+    uint8_t tiles1[3]={TILE_CLUE_HIGHLIGHT+16,TILE_CLUE_HIGHLIGHT+17,TILE_CLUE_HIGHLIGHT+18};
+    gfx_tilemap_load(&ctx,tiles1,3,1,left,top+1);
+    uint8_t tiles2[3]={TILE_CLUE_HIGHLIGHT+32,TILE_CLUE_HIGHLIGHT+33,TILE_CLUE_HIGHLIGHT+34};
+    gfx_tilemap_load(&ctx,tiles2,3,1,left,top+2);
+}
+
 void game_handle_input(uint8_t input, bool pressed)
 {
     if(phrase[0]==0 || (input==INPUT_START && !pressed)) {
@@ -148,12 +195,26 @@ void game_handle_input(uint8_t input, bool pressed)
         draw_available_letter_tile(cursor,  letter_available[cursor]?TILE_AVAILABLE_LETTER:TILE_USED_LETTER);
         cursor=(cursor+1)%26;
         draw_available_letter_tile(cursor, letter_available[cursor]?TILE_SELECTED_LETTER:TILE_SELECTED_USED_LETTER);
+    } else if(input==INPUT_UP && pressed) {
+        draw_available_letter_tile(cursor,  letter_available[cursor]?TILE_AVAILABLE_LETTER:TILE_USED_LETTER);
+        cursor=(26+cursor-7)%26;
+        draw_available_letter_tile(cursor, letter_available[cursor]?TILE_SELECTED_LETTER:TILE_SELECTED_USED_LETTER);
+    } else if(input==INPUT_DOWN && pressed) {
+        draw_available_letter_tile(cursor,  letter_available[cursor]?TILE_AVAILABLE_LETTER:TILE_USED_LETTER);
+        cursor=(cursor+7)%26;
+        draw_available_letter_tile(cursor, letter_available[cursor]?TILE_SELECTED_LETTER:TILE_SELECTED_USED_LETTER);
     } else if (input==INPUT_A && pressed) {
         // Handle selecting the current letter
         if(letter_available[cursor]) {
             letter_available[cursor] = 0;
             draw_available_letter_tile(cursor, TILE_USED_LETTER);
-            // TODO: Check if the selected letter is in the phrase and update the clue tiles accordingly.
+            // Check if the selected letter is in the phrase and 
+            // animate the letter flying up to the clue tile.
+            for(uint8_t i = 0; i < clue_count; i++) {
+                if(clue[i].letter == phrase[cursor]) {
+                    animate_clue_tile_solution(&clue[i]);
+                }
+            }
         }
     }
     
@@ -165,6 +226,29 @@ void game_update(uint16_t delta)
     (void)delta;
     // Seed random timer until the first phrase is set
     if(phrase[0]==0) rand();
+
+    for(uint8_t i = 0; i < ANIMATED_LETTER_COUNT; i++) {
+        if(animated_letter[i].sprite_index != 255) {
+            uint8_t sprite_index = animated_letter[i].sprite_index;
+            for(uint8_t step = 0; step < ANIMATED_SPEED; step++) {
+                if(sprites[sprite_index].x == animated_letter[i].target_x &&
+                   sprites[sprite_index].y == animated_letter[i].target_y) {
+                    animated_letter[i].sprite_index = 255;
+                    break;
+                }
+
+                int16_t doubled_delta = 2*animated_letter[i].delta;
+                if(doubled_delta >= animated_letter[i].delta_y) {
+                    animated_letter[i].delta += animated_letter[i].delta_y;
+                    sprites[sprite_index].x += animated_letter[i].step_x;
+                }
+                if(doubled_delta <= animated_letter[i].delta_x) {
+                    animated_letter[i].delta += animated_letter[i].delta_x;
+                    sprites[sprite_index].y += animated_letter[i].step_y;
+                }
+            }
+        }
+    }
 }
 
 void game_reset(void)
@@ -175,6 +259,7 @@ void game_reset(void)
     cursor = 0;
     next_sprite = 0;
     memset(sprites, 0, sizeof(sprites));
+    memset(animated_letter, 0xFF, sizeof(animated_letter)); // Mark all animated letters as inactive
 
     // Draw title
     const char *title_text="MOVIE HANGMAN";
@@ -211,7 +296,7 @@ void game_reset(void)
     }
     uint8_t man[6]={0};
     // Clear man from scaffold
-    for(uint8_t y=16;y<12;y++) {
+    for(uint8_t y=16;y<16+12;y++) {
         gfx_tilemap_load(&ctx,man,6,1,32,y);
     }
     uint8_t line[40]={0};
@@ -223,4 +308,5 @@ void game_reset(void)
 
 void game_draw(void)
 {
+    gfx_sprite_render_array(&ctx, 0, sprites, 128);
 }

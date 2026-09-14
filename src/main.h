@@ -45,7 +45,7 @@ enum TILESET_ID
     TILE_LEFT_SHOLDER = 0x52, // left shoulder
     TILE_RIGHT_SHOULDER = 0x53, // right shoulder
     TILE_CLUE = 0x4D, // blank clue tile 3x3
-    TILE_CLUE_HIGHLIGHT = 0x2D, // highlighted clue tile 3x3
+    TILE_CLUE_HIGHLIGHT = 0x1D, // highlighted clue tile 3x3
 };
 
 extern gfx_context ctx;
