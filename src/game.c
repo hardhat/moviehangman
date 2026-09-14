@@ -185,6 +185,7 @@ void game_handle_input(uint8_t input, bool pressed)
         movie_year = movies[index].year;
         debug_logf("Selected movie year: %d", movie_year);
         show_movie();
+        draw_available_letter_tile(cursor, TILE_SELECTED_LETTER);
         return;
     }
     if(input==INPUT_LEFT && pressed)  {
@@ -197,11 +198,13 @@ void game_handle_input(uint8_t input, bool pressed)
         draw_available_letter_tile(cursor, letter_available[cursor]?TILE_SELECTED_LETTER:TILE_SELECTED_USED_LETTER);
     } else if(input==INPUT_UP && pressed) {
         draw_available_letter_tile(cursor,  letter_available[cursor]?TILE_AVAILABLE_LETTER:TILE_USED_LETTER);
-        cursor=(26+cursor-7)%26;
+        cursor=(28+cursor-7)%28;
+        if(cursor > 25) cursor -= 7;
         draw_available_letter_tile(cursor, letter_available[cursor]?TILE_SELECTED_LETTER:TILE_SELECTED_USED_LETTER);
     } else if(input==INPUT_DOWN && pressed) {
         draw_available_letter_tile(cursor,  letter_available[cursor]?TILE_AVAILABLE_LETTER:TILE_USED_LETTER);
-        cursor=(cursor+7)%26;
+        cursor=(cursor+7)%28;
+        if(cursor > 25) cursor = cursor%7;
         draw_available_letter_tile(cursor, letter_available[cursor]?TILE_SELECTED_LETTER:TILE_SELECTED_USED_LETTER);
     } else if (input==INPUT_A && pressed) {
         // Handle selecting the current letter
@@ -211,7 +214,7 @@ void game_handle_input(uint8_t input, bool pressed)
             // Check if the selected letter is in the phrase and 
             // animate the letter flying up to the clue tile.
             for(uint8_t i = 0; i < clue_count; i++) {
-                if(clue[i].letter == phrase[cursor]) {
+                if(clue[i].letter == ('A' + cursor)) {
                     animate_clue_tile_solution(&clue[i]);
                 }
             }

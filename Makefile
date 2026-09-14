@@ -1,6 +1,6 @@
 ZOS_PATH ?= ../Zeal-8-bit-OS
 ZVB_SDK_PATH ?= ../Zeal-VideoBoard-SDK
-BIN=bin/cylix.bin
+BIN=bin/hangman.bin
 OBJ=obj/main.rel obj/img.rel obj/movies.rel obj/game.rel #obj/menu.rel
 IMG=img/tileset.zts
 MAP=map/background.ztm map/letterclue.ztm map/text.ztm
