@@ -121,15 +121,19 @@ uint8_t handle_input(uint8_t key)
             return MAX_INPUT;
         case KB_KEY_W:
         case KB_UP_ARROW:
+        case KB_NUMPAD_8:
             return INPUT_UP;
         case KB_KEY_S:
         case KB_DOWN_ARROW:
+        case KB_NUMPAD_2:
             return INPUT_DOWN;
         case KB_KEY_A:
         case KB_LEFT_ARROW:
+        case KB_NUMPAD_4:
             return INPUT_LEFT;
         case KB_KEY_D:
         case KB_RIGHT_ARROW:
+        case KB_NUMPAD_6:
             return INPUT_RIGHT;
         case KB_KEY_V:
         case KB_KEY_SPACE:
@@ -168,12 +172,16 @@ void process_input()
     do {
         size=32;
         read(DEV_STDIN, &keys, &size);
+        // if(size > 0) {
+        //     debug_logf("Read %d keys from input.", size);
+        // }
         for(int i=0;i<size;i++) {
             char key = keys[i];
-           //debug_logf("Processing input key %02x.", key);
            if(key == KB_RELEASED) {
                 pressed = false;
+                //debug_log("Processing released.");
             } else {
+                //debug_logf("Processing input key %02x.", key);
                 uint8_t input = handle_input(key);
                 if(input >= MAX_INPUT) {
                     pressed = true;
