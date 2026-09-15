@@ -172,16 +172,16 @@ void process_input()
     do {
         size=32;
         read(DEV_STDIN, &keys, &size);
-        // if(size > 0) {
-        //     debug_logf("Read %d keys from input.", size);
-        // }
+        if(size > 0) {
+            debug_logf("Read %d keys from input.", size);
+        }
         for(int i=0;i<size;i++) {
             char key = keys[i];
            if(key == KB_RELEASED) {
                 pressed = false;
-                //debug_log("Processing released.");
+                debug_log("Processing released.");
             } else {
-                //debug_logf("Processing input key %02x.", key);
+                debug_logf("Processing input key %02x.", key);
                 uint8_t input = handle_input(key);
                 if(input >= MAX_INPUT) {
                     pressed = true;

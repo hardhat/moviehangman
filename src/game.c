@@ -31,6 +31,7 @@ struct AnimatedLetter {
     int16_t delta_x,delta_y;
     int8_t step_x,step_y;
 } animated_letter[ANIMATED_LETTER_COUNT];
+int random_seed=0;
 
 uint8_t add_sprite(uint8_t tile, uint16_t x, uint16_t y,uint8_t flags)
 {
@@ -45,6 +46,32 @@ uint8_t add_sprite(uint8_t tile, uint16_t x, uint16_t y,uint8_t flags)
 void draw_available_letter_tile(uint8_t index, uint8_t tile)
 {
     gfx_tilemap_place(&ctx, tile, 1, (index%7)*2+3, (index/7)*2+22);
+}
+
+void draw_key_bindings(const char *bindings)
+{
+    uint8_t buf[40] = {0};
+    for(uint8_t i=0;i<strlen(bindings);i++) {
+        if(bindings[i] == ' ') continue;
+        switch(bindings[i]) {
+            case 'A' ... 'Z':
+                buf[i] = TILE_ALPHABET+bindings[i]-'A';
+                break;
+            case '<':
+                buf[i] = TILE_LESS_THAN; // Assuming TILE_LESS_THAN is defined for the '<' character
+                break;
+            case '>':
+                buf[i] = TILE_GREATER_THAN; // Assuming TILE_GREATER_THAN is defined for the '>' character
+                break;
+            case '0' ... '9':
+                buf[i] = TILE_NUMBER+bindings[i]-'0';
+                break;
+            default:
+                buf[i] = 0;
+                break;
+        }
+    }
+    gfx_tilemap_load(&ctx, buf, 40, 1, 1, 4);
 }
 
 void show_movie(void)
@@ -124,13 +151,20 @@ void show_movie(void)
         }
     }
 
+    draw_key_bindings("USE < > AND SPACE OR ENTER TO RESTART");
+    // Draw subtitle
+    const char *subtitle_text="FROM";
+    for(uint8_t i=0;i<strlen(subtitle_text);i++) {
+        if(subtitle_text[i] == ' ') continue;
+        add_sprite(TILE_ALPHABET+subtitle_text[i]-'A', 3*16+i*16, 48, 0);
+    }
     // Show the year in row 4, column 8
     if(movie_year > 0) {
         char year_str[16];
         sprintf(year_str, "%04d", movie_year);
         debug_log(year_str);
         for(uint8_t i=0;i<strlen(year_str);i++) {
-            add_sprite(TILE_NUMBER+year_str[i]-'0', 8*16+i*16, 4*16, 0);
+            add_sprite(TILE_NUMBER+year_str[i]-'0', 8*16+i*16, 3*16, 0);
             debug_logf("Added sprite for year digit: %c at position %d", year_str[i], i);
         }
     }
@@ -176,9 +210,13 @@ void animate_clue_tile_solution(struct Clue *clue_tile)
 void game_handle_input(uint8_t input, bool pressed)
 {
     if(phrase[0]==0 || (input==INPUT_START && !pressed)) {
+        if(phrase[0]==0) {
+            srand(random_seed);
+            random_seed++;
+        }
         // Time to pick a phrase after any input
         if(input==INPUT_START && !pressed) game_reset();
-        uint8_t index = rand() % movies_count;
+        uint8_t index = (rand()>>8) % movies_count;
         debug_logf("Selected movie index: %d", index);
         strncpy((char*)phrase, movies[index].title, sizeof(phrase));
         debug_logf("Selected movie title: %s", phrase);
@@ -228,7 +266,9 @@ void game_update(uint16_t delta)
 {
     (void)delta;
     // Seed random timer until the first phrase is set
-    if(phrase[0]==0) rand();
+    if(phrase[0]==0) {
+        random_seed++;
+    }
 
     for(uint8_t i = 0; i < ANIMATED_LETTER_COUNT; i++) {
         if(animated_letter[i].sprite_index != 255) {
@@ -264,17 +304,12 @@ void game_reset(void)
     memset(sprites, 0, sizeof(sprites));
     memset(animated_letter, 0xFF, sizeof(animated_letter)); // Mark all animated letters as inactive
 
+    draw_key_bindings("HIT SPACE TO START GAME");
     // Draw title
     const char *title_text="MOVIE HANGMAN";
     for(uint8_t i=0;i<strlen(title_text);i++) {
         if(title_text[i] == ' ') continue;
-        add_sprite(TILE_ALPHABET+title_text[i]-'A', 3*16+i*16, 32, 0);
-    }
-    // Draw subtitle
-    const char *subtitle_text="FROM";
-    for(uint8_t i=0;i<strlen(subtitle_text);i++) {
-        if(subtitle_text[i] == ' ') continue;
-        add_sprite(TILE_ALPHABET+subtitle_text[i]-'A', 3*16+i*16, 64, 0);
+        add_sprite(TILE_ALPHABET+title_text[i]-'A', 3*16+i*16, 16, 0);
     }
     // Label all of the alphabet letters for guessing
     for(uint8_t i = 0; i < 26; i++) {
@@ -299,12 +334,12 @@ void game_reset(void)
     }
     uint8_t man[6]={0};
     // Clear man from scaffold
-    for(uint8_t y=16;y<16+12;y++) {
+    for(uint8_t y=16;y<16+11;y++) {
         gfx_tilemap_load(&ctx,man,6,1,32,y);
     }
     uint8_t line[40]={0};
     // Clear solution tiles
-    for(uint8_t y=4;y<14;y++) {
+    for(uint8_t y=5;y<13;y++) {
         gfx_tilemap_load(&ctx,line,40,1,0,y);
     }
 }
