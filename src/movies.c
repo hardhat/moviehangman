@@ -6,256 +6,506 @@
 #include "movies.h"
 
 const movie_entry_t movies[] = {
+    // Original: Monsters, Inc.
     { 2001, "MONSTERS INC" },
+    // Original: Shrek
     { 2001, "SHREK" },
+    // Original: Ocean's Eleven
     { 2001, "OCEANS ELEVEN" },
+    // Original: Pearl Harbor
     { 2001, "PEARL HARBOR" },
+    // Original: The Mummy Returns
     { 2001, "THE MUMMY RETURNS" },
+    // Original: Jurassic Park III
     { 2001, "JURASSIC PARK III" },
+    // Original: Planet of the Apes
     { 2001, "PLANET OF THE APES" },
+    // Original: Hannibal
     { 2001, "HANNIBAL" },
-    { 2001, "RUSH HOUR" },
+    // Original: Rush Hour 2
+    { 2001, "RUSH HOUR 2" },
+    // Original: A Beautiful Mind
     { 2001, "A BEAUTIFUL MIND" },
+    // Original: Spider-Man
     { 2002, "SPIDER MAN" },
+    // Original: Men in Black II
     { 2002, "MEN IN BLACK II" },
+    // Original: Die Another Day
     { 2002, "DIE ANOTHER DAY" },
+    // Original: Signs
     { 2002, "SIGNS" },
+    // Original: Ice Age
     { 2002, "ICE AGE" },
+    // Original: Minority Report
     { 2002, "MINORITY REPORT" },
+    // Original: Catch Me If You Can
     { 2002, "CATCH ME IF YOU CAN" },
+    // Original: Chicago
     { 2002, "CHICAGO" },
+    // Original: xXx
     { 2002, "XXX" },
+    // Original: Scooby-Doo
     { 2002, "SCOOBY DOO" },
+    // Original: Finding Nemo
     { 2003, "FINDING NEMO" },
+    // Original: The Matrix Reloaded
     { 2003, "THE MATRIX RELOADED" },
+    // Original: Bruce Almighty
     { 2003, "BRUCE ALMIGHTY" },
+    // Original: The Last Samurai
     { 2003, "THE LAST SAMURAI" },
-    { 2003, "X" },
+    // Original: X2
+    { 2003, "X2" },
+    // Original: Bad Boys II
     { 2003, "BAD BOYS II" },
+    // Original: Love Actually
     { 2003, "LOVE ACTUALLY" },
+    // Original: Brother Bear
     { 2003, "BROTHER BEAR" },
+    // Original: Hulk
     { 2003, "HULK" },
-    { 2003, "FAST FURIOUS" },
-    { 2004, "SHREK" },
-    { 2004, "SPIDER MAN" },
+    // Original: 2 Fast 2 Furious
+    { 2003, "2 FAST 2 FURIOUS" },
+    // Original: Shrek 2
+    { 2004, "SHREK 2" },
+    // Original: Spider-Man 2
+    { 2004, "SPIDER MAN 2" },
+    // Original: The Incredibles
     { 2004, "THE INCREDIBLES" },
+    // Original: Meet the Fockers
     { 2004, "MEET THE FOCKERS" },
+    // Original: Troy
     { 2004, "TROY" },
+    // Original: Shark Tale
     { 2004, "SHARK TALE" },
+    // Original: Ocean's Twelve
     { 2004, "OCEANS TWELVE" },
+    // Original: National Treasure
     { 2004, "NATIONAL TREASURE" },
+    // Original: I, Robot
     { 2004, "I ROBOT" },
+    // Original: The Polar Express
     { 2004, "THE POLAR EXPRESS" },
+    // Original: War of the Worlds
     { 2005, "WAR OF THE WORLDS" },
+    // Original: King Kong
     { 2005, "KING KONG" },
+    // Original: Madagascar
     { 2005, "MADAGASCAR" },
-    { 2005, "MR MRS SMITH" },
+    // Original: Mr. & Mrs. Smith
+    { 2005, "MR AND MRS SMITH" },
+    // Original: Batman Begins
     { 2005, "BATMAN BEGINS" },
+    // Original: Hitch
     { 2005, "HITCH" },
+    // Original: Fantastic Four
     { 2005, "FANTASTIC FOUR" },
+    // Original: Chicken Little
     { 2005, "CHICKEN LITTLE" },
+    // Original: Wedding Crashers
     { 2005, "WEDDING CRASHERS" },
+    // Original: Robots
     { 2005, "ROBOTS" },
+    // Original: The Da Vinci Code
     { 2006, "THE DA VINCI CODE" },
+    // Original: Ice Age: The Meltdown
     { 2006, "ICE AGE THE MELTDOWN" },
+    // Original: Casino Royale
     { 2006, "CASINO ROYALE" },
+    // Original: Night at the Museum
     { 2006, "NIGHT AT THE MUSEUM" },
+    // Original: Cars
     { 2006, "CARS" },
+    // Original: X-Men: The Last Stand
     { 2006, "X MEN THE LAST STAND" },
+    // Original: Superman Returns
     { 2006, "SUPERMAN RETURNS" },
+    // Original: Happy Feet
     { 2006, "HAPPY FEET" },
+    // Original: Over the Hedge
     { 2006, "OVER THE HEDGE" },
+    // Original: The Departed
     { 2006, "THE DEPARTED" },
-    { 2007, "SPIDER MAN" },
+    // Original: Spider-Man 3
+    { 2007, "SPIDER MAN 3" },
+    // Original: Shrek the Third
     { 2007, "SHREK THE THIRD" },
+    // Original: Transformers
     { 2007, "TRANSFORMERS" },
+    // Original: Ratatouille
     { 2007, "RATATOUILLE" },
+    // Original: I Am Legend
     { 2007, "I AM LEGEND" },
+    // Original: The Simpsons Movie
     { 2007, "THE SIMPSONS MOVIE" },
+    // Original: 300
+    //{ 2007, "300" },
+    // Original: The Bourne Ultimatum
     { 2007, "THE BOURNE ULTIMATUM" },
+    // Original: The Golden Compass
     { 2007, "THE GOLDEN COMPASS" },
+    // Original: Enchanted
     { 2007, "ENCHANTED" },
-    { 2007, "OCEANS THIRTEEN" },
+    // Original: The Dark Knight
     { 2008, "THE DARK KNIGHT" },
+    // Original: Kung Fu Panda
     { 2008, "KUNG FU PANDA" },
+    // Original: Hancock
     { 2008, "HANCOCK" },
+    // Original: Mamma Mia!
     { 2008, "MAMMA MIA" },
+    // Original: Quantum of Solace
     { 2008, "QUANTUM OF SOLACE" },
+    // Original: Iron Man
     { 2008, "IRON MAN" },
+    // Original: WALL·E
     { 2008, "WALL E" },
+    // Original: Sex and the City
     { 2008, "SEX AND THE CITY" },
+    // Original: Twilight
     { 2008, "TWILIGHT" },
+    // Original: Slumdog Millionaire
     { 2008, "SLUMDOG MILLIONAIRE" },
+    // Original: Avatar
     { 2009, "AVATAR" },
+    // Original: 2012
+    //{ 2009, "2012" },
+    // Original: Up
     { 2009, "UP" },
+    // Original: Sherlock Holmes
     { 2009, "SHERLOCK HOLMES" },
+    // Original: Angels & Demons
     { 2009, "ANGELS DEMONS" },
+    // Original: The Hangover
     { 2009, "THE HANGOVER" },
+    // Original: Star Trek
     { 2009, "STAR TREK" },
+    // Original: Monsters vs Aliens
     { 2009, "MONSTERS VS ALIENS" },
+    // Original: Terminator Salvation
     { 2009, "TERMINATOR SALVATION" },
+    // Original: Fast & Furious
     { 2009, "FAST FURIOUS" },
-    { 2009, "A CHRISTMAS CAROL" },
-    { 2010, "TOY STORY" },
+    // Original: Toy Story 3
+    { 2010, "TOY STORY 3" },
+    // Original: Alice in Wonderland
     { 2010, "ALICE IN WONDERLAND" },
+    // Original: Inception
     { 2010, "INCEPTION" },
+    // Original: Shrek Forever After
     { 2010, "SHREK FOREVER AFTER" },
-    { 2010, "IRON MAN" },
+    // Original: Iron Man 2
+    { 2010, "IRON MAN 2" },
+    // Original: Tangled
     { 2010, "TANGLED" },
+    // Original: Despicable Me
     { 2010, "DESPICABLE ME" },
+    // Original: Clash of the Titans
     { 2010, "CLASH OF THE TITANS" },
+    // Original: The King's Speech
     { 2010, "THE KINGS SPEECH" },
+    // Original: TRON: Legacy
     { 2010, "TRON LEGACY" },
-    { 2011, "KUNG FU PANDA" },
+    // Original: Kung Fu Panda 2
+    { 2011, "KUNG FU PANDA 2" },
+    // Original: Fast Five
     { 2011, "FAST FIVE" },
+    // Original: The Hangover Part II
     { 2011, "THE HANGOVER PART II" },
+    // Original: The Smurfs
     { 2011, "THE SMURFS" },
-    { 2011, "CARS" },
+    // Original: Cars 2
+    { 2011, "CARS 2" },
+    // Original: Puss in Boots
     { 2011, "PUSS IN BOOTS" },
+    // Original: Rio
     { 2011, "RIO" },
+    // Original: Thor
     { 2011, "THOR" },
+    // Original: The Intouchables
     { 2011, "THE INTOUCHABLES" },
+    // Original: X-Men: First Class
     { 2011, "X MEN FIRST CLASS" },
+    // Original: The Avengers
     { 2012, "THE AVENGERS" },
+    // Original: Skyfall
     { 2012, "SKYFALL" },
+    // Original: The Hunger Games
     { 2012, "THE HUNGER GAMES" },
-    { 2012, "MEN IN BLACK" },
+    // Original: Men in Black 3
+    { 2012, "MEN IN BLACK 3" },
+    // Original: Life of Pi
     { 2012, "LIFE OF PI" },
+    // Original: Ted
     { 2012, "TED" },
+    // Original: Brave
     { 2012, "BRAVE" },
+    // Original: Wreck-It Ralph
     { 2012, "WRECK IT RALPH" },
+    // Original: Les Misérables
     { 2012, "LES MIS RABLES" },
+    // Original: Django Unchained
     { 2012, "DJANGO UNCHAINED" },
+    // Original: Frozen
     { 2013, "FROZEN" },
-    { 2013, "IRON MAN" },
-    { 2013, "DESPICABLE ME" },
-    { 2013, "FAST FURIOUS" },
+    // Original: Iron Man 3
+    { 2013, "IRON MAN 3" },
+    // Original: Despicable Me 2
+    { 2013, "DESPICABLE ME 2" },
+    // Original: Fast & Furious 6
+    { 2013, "FAST FURIOUS 6" },
+    // Original: Monsters University
     { 2013, "MONSTERS UNIVERSITY" },
+    // Original: Gravity
     { 2013, "GRAVITY" },
+    // Original: Man of Steel
     { 2013, "MAN OF STEEL" },
+    // Original: Thor: The Dark World
     { 2013, "THOR THE DARK WORLD" },
+    // Original: The Croods
     { 2013, "THE CROODS" },
+    // Original: World War Z
     { 2013, "WORLD WAR Z" },
+    // Original: Maleficent
     { 2014, "MALEFICENT" },
+    // Original: Interstellar
     { 2014, "INTERSTELLAR" },
-    { 2014, "BIG HERO" },
+    // Original: Big Hero 6
+    { 2014, "BIG HERO 6" },
+    // Original: American Sniper
     { 2014, "AMERICAN SNIPER" },
+    // Original: Godzilla
     { 2014, "GODZILLA" },
-    { 2014, "RIO" },
+    // Original: Rio 2
+    { 2014, "RIO 2" },
+    // Original: The Lego Movie
     { 2014, "THE LEGO MOVIE" },
+    // Original: Lucy
     { 2014, "LUCY" },
+    // Original: Gone Girl
     { 2014, "GONE GIRL" },
+    // Original: Edge of Tomorrow
     { 2014, "EDGE OF TOMORROW" },
+    // Original: Jurassic World
     { 2015, "JURASSIC WORLD" },
-    { 2015, "FURIOUS" },
+    // Original: Furious 7
+    { 2015, "FURIOUS 7" },
+    // Original: Minions
     { 2015, "MINIONS" },
+    // Original: Spectre
     { 2015, "SPECTRE" },
+    // Original: Inside Out
     { 2015, "INSIDE OUT" },
+    // Original: The Martian
     { 2015, "THE MARTIAN" },
+    // Original: Fifty Shades of Grey
     { 2015, "FIFTY SHADES OF GREY" },
+    // Original: Cinderella
     { 2015, "CINDERELLA" },
+    // Original: The Revenant
     { 2015, "THE REVENANT" },
+    // Original: Ant-Man
     { 2015, "ANT MAN" },
+    // Original: Finding Dory
     { 2016, "FINDING DORY" },
+    // Original: Zootopia
     { 2016, "ZOOTOPIA" },
+    // Original: The Jungle Book
     { 2016, "THE JUNGLE BOOK" },
+    // Original: Deadpool
     { 2016, "DEADPOOL" },
+    // Original: Suicide Squad
     { 2016, "SUICIDE SQUAD" },
+    // Original: Moana
     { 2016, "MOANA" },
+    // Original: Doctor Strange
     { 2016, "DOCTOR STRANGE" },
+    // Original: Sing
     { 2016, "SING" },
+    // Original: The Mermaid
     { 2016, "THE MERMAID" },
+    // Original: X-Men: Apocalypse
     { 2016, "X MEN APOCALYPSE" },
+    // Original: Beauty and the Beast
     { 2017, "BEAUTY AND THE BEAST" },
-    { 2017, "DESPICABLE ME" },
-    { 2017, "WOLF WARRIOR" },
+    // Original: Despicable Me 3
+    { 2017, "DESPICABLE ME 3" },
+    // Original: Wolf Warrior 2
+    { 2017, "WOLF WARRIOR 2" },
+    // Original: Thor: Ragnarok
     { 2017, "THOR RAGNAROK" },
+    // Original: Wonder Woman
     { 2017, "WONDER WOMAN" },
+    // Original: Coco
     { 2017, "COCO" },
+    // Original: It
     { 2017, "IT" },
+    // Original: Justice League
     { 2017, "JUSTICE LEAGUE" },
+    // Original: Logan
     { 2017, "LOGAN" },
+    // Original: Kong: Skull Island
     { 2017, "KONG SKULL ISLAND" },
+    // Original: Black Panther
     { 2018, "BLACK PANTHER" },
-    { 2018, "INCREDIBLES" },
+    // Original: Incredibles 2
+    { 2018, "INCREDIBLES 2" },
+    // Original: Aquaman
     { 2018, "AQUAMAN" },
+    // Original: Bohemian Rhapsody
     { 2018, "BOHEMIAN RHAPSODY" },
+    // Original: Venom
     { 2018, "VENOM" },
-    { 2018, "DEADPOOL" },
+    // Original: Deadpool 2
+    { 2018, "DEADPOOL 2" },
+    // Original: Ant-Man and the Wasp
     { 2018, "ANT MAN AND THE WASP" },
+    // Original: Ready Player One
     { 2018, "READY PLAYER ONE" },
+    // Original: Operation Red Sea
     { 2018, "OPERATION RED SEA" },
+    // Original: The Grinch
     { 2018, "THE GRINCH" },
+    // Original: Avengers: Endgame
     { 2019, "AVENGERS ENDGAME" },
+    // Original: The Lion King
     { 2019, "THE LION KING" },
+    // Original: Frozen II
     { 2019, "FROZEN II" },
+    // Original: Captain Marvel
     { 2019, "CAPTAIN MARVEL" },
+    // Original: Joker
     { 2019, "JOKER" },
-    { 2019, "TOY STORY" },
+    // Original: Toy Story 4
+    { 2019, "TOY STORY 4" },
+    // Original: Aladdin
     { 2019, "ALADDIN" },
+    // Original: Ne Zha
     { 2019, "NE ZHA" },
+    // Original: It Chapter Two
     { 2019, "IT CHAPTER TWO" },
-    { 2019, "ALITA BATTLE ANGEL" },
+    // Original: 1917
+    //{ 2019, "1917" },
+    // Original: The Eight Hundred
     { 2020, "THE EIGHT HUNDRED" },
+    // Original: Bad Boys for Life
     { 2020, "BAD BOYS FOR LIFE" },
+    // Original: Tenet
     { 2020, "TENET" },
+    // Original: Sonic the Hedgehog
     { 2020, "SONIC THE HEDGEHOG" },
+    // Original: Dolittle
     { 2020, "DOLITTLE" },
+    // Original: Jiang Ziya
     { 2020, "JIANG ZIYA" },
+    // Original: The Croods: A New Age
     { 2020, "THE CROODS A NEW AGE" },
-    { 2020, "WONDER WOMAN" },
+    // Original: Wonder Woman 1984
+    { 2020, "WONDER WOMAN 1984" },
+    // Original: The Invisible Man
     { 2020, "THE INVISIBLE MAN" },
+    // Original: Onward
     { 2020, "ONWARD" },
+    // Original: No Time to Die
     { 2021, "NO TIME TO DIE" },
-    { 2021, "F" },
+    // Original: F9
+    { 2021, "F9" },
+    // Original: Godzilla vs. Kong
     { 2021, "GODZILLA VS KONG" },
+    // Original: Dune
     { 2021, "DUNE" },
-    { 2021, "SING" },
+    // Original: Sing 2
+    { 2021, "SING 2" },
+    // Original: Eternals
     { 2021, "ETERNALS" },
+    // Original: Black Widow
     { 2021, "BLACK WIDOW" },
+    // Original: Free Guy
     { 2021, "FREE GUY" },
-    { 2021, "FEAR STREET" },
+    // Original: Fear Street: 1994
+    { 2021, "FEAR STREET 1994" },
+    // Original: Encanto
     { 2021, "ENCANTO" },
+    // Original: Top Gun: Maverick
     { 2022, "TOP GUN MAVERICK" },
+    // Original: The Batman
     { 2022, "THE BATMAN" },
+    // Original: Uncharted
     { 2022, "UNCHARTED" },
-    { 2022, "SONIC THE HEDGEHOG" },
+    // Original: Sonic the Hedgehog 2
+    { 2022, "SONIC THE HEDGEHOG 2" },
+    // Original: Black Adam
     { 2022, "BLACK ADAM" },
+    // Original: Suzume
     { 2022, "SUZUME" },
+    // Original: Elvis
     { 2022, "ELVIS" },
+    // Original: The First Slam Dunk
     { 2022, "THE FIRST SLAM DUNK" },
+    // Original: The Bad Guys
     { 2022, "THE BAD GUYS" },
+    // Original: Bullet Train
     { 2022, "BULLET TRAIN" },
+    // Original: Barbie
     { 2023, "BARBIE" },
+    // Original: Oppenheimer
     { 2023, "OPPENHEIMER" },
+    // Original: Fast X
     { 2023, "FAST X" },
+    // Original: Wonka
     { 2023, "WONKA" },
+    // Original: The Little Mermaid
     { 2023, "THE LITTLE MERMAID" },
+    // Original: Elemental
     { 2023, "ELEMENTAL" },
-    { 2023, "JOHN WICK CHAPTER" },
-    { 2023, "MEG THE TRENCH" },
+    // Original: John Wick: Chapter 4
+    { 2023, "JOHN WICK CHAPTER 4" },
+    // Original: Meg 2: The Trench
+    { 2023, "MEG 2 THE TRENCH" },
+    // Original: Migration
     { 2023, "MIGRATION" },
+    // Original: Creed III
     { 2023, "CREED III" },
-    { 2024, "INSIDE OUT" },
+    // Original: Inside Out 2
+    { 2024, "INSIDE OUT 2" },
+    // Original: Deadpool & Wolverine
     { 2024, "DEADPOOL WOLVERINE" },
-    { 2024, "MOANA" },
-    { 2024, "DESPICABLE ME" },
+    // Original: Moana 2
+    { 2024, "MOANA 2" },
+    // Original: Despicable Me 4
+    { 2024, "DESPICABLE ME 4" },
+    // Original: Wicked
     { 2024, "WICKED" },
+    // Original: Mufasa: The Lion King
     { 2024, "MUFASA THE LION KING" },
+    // Original: Dune: Part Two
     { 2024, "DUNE PART TWO" },
-    { 2024, "KUNG FU PANDA" },
-    { 2024, "SONIC THE HEDGEHOG" },
+    // Original: Kung Fu Panda 4
+    { 2024, "KUNG FU PANDA 4" },
+    // Original: Sonic the Hedgehog 3
+    { 2024, "SONIC THE HEDGEHOG 3" },
+    // Original: Venom: The Last Dance
     { 2024, "VENOM THE LAST DANCE" },
-    { 2025, "NE ZHA" },
-    { 2025, "ZOOTOPIA" },
+    // Original: Ne Zha 2
+    { 2025, "NE ZHA 2" },
+    // Original: Zootopia 2
+    { 2025, "ZOOTOPIA 2" },
+    // Original: Avatar: Fire and Ash
     { 2025, "AVATAR FIRE AND ASH" },
+    // Original: Lilo & Stitch
     { 2025, "LILO STITCH" },
+    // Original: A Minecraft Movie
     { 2025, "A MINECRAFT MOVIE" },
-    { 2025, "F" },
+    // Original: F1
+    { 2025, "F1" },
+    // Original: Superman
     { 2025, "SUPERMAN" },
+    // Original: Wicked: For Good
     { 2025, "WICKED FOR GOOD" },
+    // Original: The Housemaid
     { 2025, "THE HOUSEMAID" },
+    // Original: Thunderbolts*
     { 2025, "THUNDERBOLTS" },
 };
 
-const uint16_t movies_count = 250;
+const uint16_t movies_count = 250-3;

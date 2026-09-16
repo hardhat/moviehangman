@@ -18,3 +18,4 @@
 *.ztm
 /main.asm
 /s
+__pycache__

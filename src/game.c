@@ -10,9 +10,11 @@
 
 uint16_t movie_year=0;
 uint8_t phrase[32]; // Stores the current movie name for the round.
-uint8_t letter_available[26]; // Tracks which letters are available for guessing.
+#define AVAILABLE_CHARACTER_COUNT 36
+#define AVAILABLE_CHARACTER_COLUMNS 9
+uint8_t letter_available[AVAILABLE_CHARACTER_COUNT]; // Tracks which letters and digits are available for guessing.
 uint8_t letter_count = 0;
-uint8_t cursor = 0; // Tracks which letter is highlighted for the current round.
+uint8_t cursor = 0; // Tracks which letter or digit is highlighted for the current round.
 // Track the letters in the current phrase.
 #define CLUE_COUNT 32
 struct Clue {
@@ -43,9 +45,28 @@ uint8_t add_sprite(uint8_t tile, uint16_t x, uint16_t y,uint8_t flags)
     return next_sprite++;
 }
 
+uint8_t character_tile(char character)
+{
+    if(character >= 'A' && character <= 'Z') {
+        return TILE_ALPHABET + character - 'A';
+    }
+    if(character >= '0' && character <= '9') {
+        return TILE_NUMBER + character - '0';
+    }
+    return TILE_BACKGROUND;
+}
+
+char available_character(uint8_t index)
+{
+    if(index < 26) return 'A' + index;
+    return '0' + index - 26;
+}
+
 void draw_available_letter_tile(uint8_t index, uint8_t tile)
 {
-    gfx_tilemap_place(&ctx, tile, 1, (index%7)*2+3, (index/7)*2+22);
+    gfx_tilemap_place(&ctx, tile, 1,
+        (index%AVAILABLE_CHARACTER_COLUMNS)*2+3,
+        (index/AVAILABLE_CHARACTER_COLUMNS)*2+22);
 }
 
 void draw_key_bindings(const char *bindings)
@@ -54,20 +75,14 @@ void draw_key_bindings(const char *bindings)
     for(uint8_t i=0;i<strlen(bindings);i++) {
         if(bindings[i] == ' ') continue;
         switch(bindings[i]) {
-            case 'A' ... 'Z':
-                buf[i] = TILE_ALPHABET+bindings[i]-'A';
-                break;
             case '<':
                 buf[i] = TILE_LESS_THAN; // Assuming TILE_LESS_THAN is defined for the '<' character
                 break;
             case '>':
                 buf[i] = TILE_GREATER_THAN; // Assuming TILE_GREATER_THAN is defined for the '>' character
                 break;
-            case '0' ... '9':
-                buf[i] = TILE_NUMBER+bindings[i]-'0';
-                break;
             default:
-                buf[i] = 0;
+                buf[i] = character_tile(bindings[i]);
                 break;
         }
     }
@@ -118,7 +133,7 @@ void show_movie(void)
     // Calculate where the centered tiles should go
     uint8_t left = 19-(max_line*3)/2;
     uint8_t original_left = left;
-    uint8_t top = 8-(line_count*3)/2;
+    uint8_t top = 9-(line_count*3)/2;
     clue_count=0;
     // Now draw the tiles for the 1, 2 or 3 lines:
     for(active_line=0;active_line<line_count;active_line++) {
@@ -145,7 +160,7 @@ void show_movie(void)
     debug_logf("Clue count after drawing: %d", clue_count);
 
     cursor=0;
-    for(int i=0;i<26;i++) {
+    for(int i=0;i<AVAILABLE_CHARACTER_COUNT;i++) {
         if(i!=cursor) {
             draw_available_letter_tile(i, letter_available[i]?TILE_AVAILABLE_LETTER:TILE_USED_LETTER);
         }
@@ -156,7 +171,7 @@ void show_movie(void)
     const char *subtitle_text="FROM";
     for(uint8_t i=0;i<strlen(subtitle_text);i++) {
         if(subtitle_text[i] == ' ') continue;
-        add_sprite(TILE_ALPHABET+subtitle_text[i]-'A', 3*16+i*16, 48, 0);
+        add_sprite(character_tile(subtitle_text[i]), 3*16+i*16, 48, 0);
     }
     // Show the year in row 4, column 8
     if(movie_year > 0) {
@@ -164,7 +179,7 @@ void show_movie(void)
         sprintf(year_str, "%04d", movie_year);
         debug_log(year_str);
         for(uint8_t i=0;i<strlen(year_str);i++) {
-            add_sprite(TILE_NUMBER+year_str[i]-'0', 8*16+i*16, 3*16, 0);
+            add_sprite(character_tile(year_str[i]), 8*16+i*16, 3*16, 0);
             debug_logf("Added sprite for year digit: %c at position %d", year_str[i], i);
         }
     }
@@ -180,11 +195,12 @@ void animate_clue_tile_solution(struct Clue *clue_tile)
     }
     if(i==ANIMATED_LETTER_COUNT) return; // animation overflow
     animated_letter[i].letter = clue_tile->letter;
-    uint8_t index = clue_tile->letter-'A';
+    uint8_t index = clue_tile->letter >= 'A' && clue_tile->letter <= 'Z'
+        ? clue_tile->letter-'A' : clue_tile->letter-'0'+26;
     // Start position for the animated letter sprite on the selection grid
-    animated_letter[i].sprite_index = add_sprite(TILE_ALPHABET+clue_tile->letter-'A', 
-        ((index%7)*2+3)*16+16, 
-        ((index/7)*2+22)*16+16,
+    animated_letter[i].sprite_index = add_sprite(character_tile(clue_tile->letter),
+        ((index%AVAILABLE_CHARACTER_COLUMNS)*2+3)*16+16,
+        ((index/AVAILABLE_CHARACTER_COLUMNS)*2+22)*16+16,
         0);
     animated_letter[i].target_x = clue_tile->x*16+32;
     animated_letter[i].target_y = clue_tile->y*16+32;
@@ -228,21 +244,19 @@ void game_handle_input(uint8_t input, bool pressed)
     }
     if(input==INPUT_LEFT && pressed)  {
         draw_available_letter_tile(cursor,  letter_available[cursor]?TILE_AVAILABLE_LETTER:TILE_USED_LETTER);
-        cursor=(26+cursor-1)%26;
+        cursor=(AVAILABLE_CHARACTER_COUNT+cursor-1)%AVAILABLE_CHARACTER_COUNT;
         draw_available_letter_tile(cursor, letter_available[cursor]?TILE_SELECTED_LETTER:TILE_SELECTED_USED_LETTER);
     } else if(input==INPUT_RIGHT && pressed) {
         draw_available_letter_tile(cursor,  letter_available[cursor]?TILE_AVAILABLE_LETTER:TILE_USED_LETTER);
-        cursor=(cursor+1)%26;
+        cursor=(cursor+1)%AVAILABLE_CHARACTER_COUNT;
         draw_available_letter_tile(cursor, letter_available[cursor]?TILE_SELECTED_LETTER:TILE_SELECTED_USED_LETTER);
     } else if(input==INPUT_UP && pressed) {
         draw_available_letter_tile(cursor,  letter_available[cursor]?TILE_AVAILABLE_LETTER:TILE_USED_LETTER);
-        cursor=(28+cursor-7)%28;
-        if(cursor > 25) cursor -= 7;
+        cursor=(AVAILABLE_CHARACTER_COUNT+cursor-AVAILABLE_CHARACTER_COLUMNS)%AVAILABLE_CHARACTER_COUNT;
         draw_available_letter_tile(cursor, letter_available[cursor]?TILE_SELECTED_LETTER:TILE_SELECTED_USED_LETTER);
     } else if(input==INPUT_DOWN && pressed) {
         draw_available_letter_tile(cursor,  letter_available[cursor]?TILE_AVAILABLE_LETTER:TILE_USED_LETTER);
-        cursor=(cursor+7)%28;
-        if(cursor > 25) cursor = cursor%7;
+        cursor=(cursor+AVAILABLE_CHARACTER_COLUMNS)%AVAILABLE_CHARACTER_COUNT;
         draw_available_letter_tile(cursor, letter_available[cursor]?TILE_SELECTED_LETTER:TILE_SELECTED_USED_LETTER);
     } else if (input==INPUT_A && pressed) {
         // Handle selecting the current letter
@@ -252,7 +266,7 @@ void game_handle_input(uint8_t input, bool pressed)
             // Check if the selected letter is in the phrase and 
             // animate the letter flying up to the clue tile.
             for(uint8_t i = 0; i < clue_count; i++) {
-                if(clue[i].letter == ('A' + cursor)) {
+                if(clue[i].letter == available_character(cursor)) {
                     animate_clue_tile_solution(&clue[i]);
                 }
             }
@@ -309,15 +323,15 @@ void game_reset(void)
     const char *title_text="MOVIE HANGMAN";
     for(uint8_t i=0;i<strlen(title_text);i++) {
         if(title_text[i] == ' ') continue;
-        add_sprite(TILE_ALPHABET+title_text[i]-'A', 3*16+i*16, 16, 0);
+        add_sprite(character_tile(title_text[i]), 3*16+i*16, 16, 0);
     }
-    // Label all of the alphabet letters for guessing
-    for(uint8_t i = 0; i < 26; i++) {
-        add_sprite(TILE_ALPHABET+i, 64+(i%7)*32, (i/7)*32+22*16+16, 0);
+    // Label all of the alphabet letters and digits for guessing
+    for(uint8_t i = 0; i < AVAILABLE_CHARACTER_COUNT; i++) {
+        add_sprite(character_tile(available_character(i)),
+            64+(i%AVAILABLE_CHARACTER_COLUMNS)*32,
+            (i/AVAILABLE_CHARACTER_COLUMNS)*32+22*16+16, 0);
         draw_available_letter_tile(i, TILE_AVAILABLE_LETTER);
     }
-    draw_available_letter_tile(26, TILE_AVAILABLE_LETTER+1);
-    draw_available_letter_tile(27, TILE_AVAILABLE_LETTER+1);
     gfx_sprite_render_array(&ctx, 0, sprites, 128);
 
     for(uint8_t i = 0; i < clue_count; i++) {
@@ -329,7 +343,7 @@ void game_reset(void)
     clue_count = 0;
 
     // Display alphabet availability for guessing
-    for(uint8_t i = 0; i < 26; i++) {
+    for(uint8_t i = 0; i < AVAILABLE_CHARACTER_COUNT; i++) {
         draw_available_letter_tile(i, TILE_AVAILABLE_LETTER);
     }
     uint8_t man[6]={0};
