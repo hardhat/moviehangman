@@ -374,7 +374,7 @@ void game_update(uint16_t delta)
                 fireworks[i].step_x = (rand() % 3) - 1; // Random horizontal step for the firework
                 fireworks[i].step_y = 1; // Random vertical step for the firework
                 fireworks[i].accel_y = FIREWORK_INITIAL_ACCEL_Y; // Initial acceleration in the y direction
-                fireworks[i].sprite_index = find_sprite(TILE_FIREWORK, fireworks[i].x, fireworks[i].y, 0);
+                fireworks[i].sprite_index = find_sprite(TILE_FIREWORK, fireworks[i].x, fireworks[i].y, rand()&6);
             } else {
                 fireworks[i].x += fireworks[i].step_x;
                 fireworks[i].y += fireworks[i].step_y;
