@@ -369,12 +369,13 @@ void game_update(uint16_t delta)
         // Update fireworks for celebration
         for(uint8_t i = 0; i < FIREWORK_COUNT; i++) {
             if( fireworks[i].sprite_index == 255) {
-                fireworks[i].x = (rand() % 128) + 160; // Random x position for the firework
-                fireworks[i].y = rand() % 128; // Random y position for the firework
+                fireworks[i].x = ((rand()>>7)&511) + 320-256; // Random x position for the firework
+                fireworks[i].y = (rand()>>8) % 128; // Random y position for the firework
                 fireworks[i].step_x = (rand() % 3) - 1; // Random horizontal step for the firework
                 fireworks[i].step_y = 1; // Random vertical step for the firework
                 fireworks[i].accel_y = FIREWORK_INITIAL_ACCEL_Y; // Initial acceleration in the y direction
-                fireworks[i].sprite_index = find_sprite(TILE_FIREWORK, fireworks[i].x, fireworks[i].y, rand()&6);
+                uint8_t tile = (rand() & 1) ? TILE_FIREWORK : TILE_FIREWORK_2;
+                fireworks[i].sprite_index = find_sprite(tile, fireworks[i].x, fireworks[i].y, rand()&6);
             } else {
                 fireworks[i].x += fireworks[i].step_x;
                 fireworks[i].y += fireworks[i].step_y;
@@ -385,7 +386,7 @@ void game_update(uint16_t delta)
                 //sprite->tile = TILE_FIREWORK+TILE_FIREWORK_2-sprite->tile;
                 sprite->x = fireworks[i].x;
                 sprite->y = fireworks[i].y;
-                if(fireworks[i].x >= 128+160 || fireworks[i].y >= 128) {
+                if(fireworks[i].x >= 640 || fireworks[i].y >= 256) {
                     // Reset the firework if it goes out of bounds
                     sprite->x = 0;
                     sprite->y = 0;
