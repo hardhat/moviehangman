@@ -48,6 +48,8 @@ enum TILESET_ID
     TILE_CLUE_HIGHLIGHT = 0x1D, // highlighted clue tile 3x3
     TILE_LESS_THAN = 0x68, // '<' character
     TILE_GREATER_THAN = 0x69, // '>' character
+    TILE_FIREWORK = 0x3A, // firework tile
+    TILE_FIREWORK_2 = 0x4A // second firework tile
 };
 
 extern gfx_context ctx;

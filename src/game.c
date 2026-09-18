@@ -14,7 +14,9 @@ uint8_t phrase[32]; // Stores the current movie name for the round.
 #define AVAILABLE_CHARACTER_COLUMNS 9
 uint8_t letter_available[AVAILABLE_CHARACTER_COUNT]; // Tracks which letters and digits are available for guessing.
 uint8_t letter_count = 0;
+uint8_t unsolved_count = 0; // Tracks the number of unsolved letters in the current phrase.
 uint8_t cursor = 0; // Tracks which letter or digit is highlighted for the current round.
+bool won=false; // Show fireworks when the game is won
 // Track the letters in the current phrase.
 #define CLUE_COUNT 32
 struct Clue {
@@ -34,15 +36,46 @@ struct AnimatedLetter {
     int8_t step_x,step_y;
 } animated_letter[ANIMATED_LETTER_COUNT];
 int random_seed=0;
+#define FIREWORK_COUNT 32
+#define GRAVITY 1
+#define FIREWORK_INITIAL_ACCEL_Y 8
+struct Fireworks {
+    uint8_t sprite_index;   // The sprite index of the firework or 255 if inactive.
+    uint16_t x, y;          // In pixels, the position of the firework.
+    int16_t step_x, step_y; // The velocity of the firework.
+    uint8_t accel_y;       // The acceleration in the y direction.
+    uint8_t lifetime;       // The remaining lifetime of the firework.
+} fireworks[FIREWORK_COUNT]; // Array to hold multiple fireworks, adjust the size as needed.
 
 uint8_t add_sprite(uint8_t tile, uint16_t x, uint16_t y,uint8_t flags)
 {
+    if(next_sprite>=128) return 255;
     sprites[next_sprite].tile = tile;
     sprites[next_sprite].x = x;
     sprites[next_sprite].y = y;
     sprites[next_sprite].flags = flags;
     sprites[next_sprite].options = 0;
     return next_sprite++;
+}
+
+uint8_t find_sprite(uint8_t tile, uint16_t x, uint16_t y,uint8_t flags)
+{
+    uint8_t sprite_index;
+    // Look for an inactive sprite that can be reused.
+    for(sprite_index=0;sprite_index<next_sprite;sprite_index++) {
+        if(sprites[sprite_index].tile == 0 &&
+           sprites[sprite_index].x == 0 &&
+           sprites[sprite_index].y == 0) {
+            sprites[sprite_index].tile = tile;
+            sprites[sprite_index].x = x;
+            sprites[sprite_index].y = y;
+            sprites[sprite_index].flags = flags;
+            sprites[sprite_index].options = 0;
+            return sprite_index;
+        }
+    }
+    // None available, so add one, if possible
+    return add_sprite(tile, x, y, flags);
 }
 
 uint8_t character_tile(char character)
@@ -54,6 +87,17 @@ uint8_t character_tile(char character)
         return TILE_NUMBER + character - '0';
     }
     return TILE_BACKGROUND;
+}
+
+uint8_t character_index(char character)
+{
+    if(character >= 'A' && character <= 'Z') {
+        return character - 'A';
+    }
+    if(character >= '0' && character <= '9') {
+        return 26 + character - '0';
+    }
+    return 255; // Invalid character
 }
 
 char available_character(uint8_t index)
@@ -120,15 +164,16 @@ void show_movie(void)
             word_start=i+1;
         }
     }
+    unsolved_count = clue_count; // Initialize the unsolved count to the total number of clues.
     // Finalize the last line.
     line[line_count-1]=cur_len;
     if(cur_len>max_line) max_line=cur_len;
 
-    debug_logf("Phrase length: %d", len);
-    debug_logf("Line count: %d", line_count);
-    debug_logf("Line start indices: %d, %d, %d", line_start[0], line_start[1], line_start[2]);
-    debug_logf("Line lengths: %d, %d, %d", line[0], line[1], line[2]);
-    debug_logf("Max line length: %d", max_line);
+    // debug_logf("Phrase length: %d", len);
+    // debug_logf("Line count: %d", line_count);
+    // debug_logf("Line start indices: %d, %d, %d", line_start[0], line_start[1], line_start[2]);
+    // debug_logf("Line lengths: %d, %d, %d", line[0], line[1], line[2]);
+    // debug_logf("Max line length: %d", max_line);
 
     // Calculate where the centered tiles should go
     uint8_t left = 19-(max_line*3)/2;
@@ -139,6 +184,7 @@ void show_movie(void)
     for(active_line=0;active_line<line_count;active_line++) {
         for(uint8_t letter=0;letter<line[active_line];letter++) {
             // Update clue structure and draw the clue tile.
+            if(phrase[line_start[active_line] + letter] == ' ') continue;
             clue[clue_count].letter = phrase[line_start[active_line] + letter];
             clue[clue_count].sprite_index = 255; // unsolved
             clue[clue_count].x = left;
@@ -157,7 +203,7 @@ void show_movie(void)
         left=original_left;
         top+=3;
     }
-    debug_logf("Clue count after drawing: %d", clue_count);
+    // debug_logf("Clue count after drawing: %d", clue_count);
 
     cursor=0;
     for(int i=0;i<AVAILABLE_CHARACTER_COUNT;i++) {
@@ -177,10 +223,10 @@ void show_movie(void)
     if(movie_year > 0) {
         char year_str[16];
         sprintf(year_str, "%04d", movie_year);
-        debug_log(year_str);
+        //debug_log(year_str);
         for(uint8_t i=0;i<strlen(year_str);i++) {
             add_sprite(character_tile(year_str[i]), 8*16+i*16, 3*16, 0);
-            debug_logf("Added sprite for year digit: %c at position %d", year_str[i], i);
+            // debug_logf("Added sprite for year digit: %c at position %d", year_str[i], i);
         }
     }
     gfx_sprite_render_array(&ctx, 0, sprites, next_sprite);
@@ -233,11 +279,11 @@ void game_handle_input(uint8_t input, bool pressed)
         // Time to pick a phrase after any input
         if(input==INPUT_START && !pressed) game_reset();
         uint8_t index = (rand()>>8) % movies_count;
-        debug_logf("Selected movie index: %d", index);
+        // debug_logf("Selected movie index: %d", index);
         strncpy((char*)phrase, movies[index].title, sizeof(phrase));
-        debug_logf("Selected movie title: %s", phrase);
+        // debug_logf("Selected movie title: %s", phrase);
         movie_year = movies[index].year;
-        debug_logf("Selected movie year: %d", movie_year);
+        // debug_logf("Selected movie year: %d", movie_year);
         show_movie();
         draw_available_letter_tile(cursor, TILE_SELECTED_LETTER);
         return;
@@ -265,10 +311,19 @@ void game_handle_input(uint8_t input, bool pressed)
             draw_available_letter_tile(cursor, TILE_USED_LETTER);
             // Check if the selected letter is in the phrase and 
             // animate the letter flying up to the clue tile.
+            unsolved_count=0;
             for(uint8_t i = 0; i < clue_count; i++) {
                 if(clue[i].letter == available_character(cursor)) {
                     animate_clue_tile_solution(&clue[i]);
+                } else if(clue[i].letter != 0 && letter_available[character_index(clue[i].letter)]) {
+                    unsolved_count++;
+                    //debug_logf("Letter %d:%c is still unsolved.", i, clue[i].letter);
                 }
+            }
+            //debug_logf("Unsolved count: %d", unsolved_count);
+            if(unsolved_count == 0) {
+                won = true;
+                //debug_log("You won!");
             }
         }
     }
@@ -291,6 +346,7 @@ void game_update(uint16_t delta)
                 if(sprites[sprite_index].x == animated_letter[i].target_x &&
                    sprites[sprite_index].y == animated_letter[i].target_y) {
                     animated_letter[i].sprite_index = 255;
+                    unsolved_count--;
                     break;
                 }
 
@@ -306,6 +362,39 @@ void game_update(uint16_t delta)
             }
         }
     }
+    if(won) {
+        // Update fireworks for celebration
+        for(uint8_t i = 0; i < FIREWORK_COUNT; i++) {
+            if( fireworks[i].sprite_index == 255) {
+                fireworks[i].x = (rand() % 128) + 160; // Random x position for the firework
+                fireworks[i].y = rand() % 128; // Random y position for the firework
+                fireworks[i].step_x = (rand() % 3) - 1; // Random horizontal step for the firework
+                fireworks[i].step_y = 1; // Random vertical step for the firework
+                fireworks[i].accel_y = FIREWORK_INITIAL_ACCEL_Y; // Initial acceleration in the y direction
+                fireworks[i].sprite_index = find_sprite(TILE_FIREWORK, fireworks[i].x, fireworks[i].y, 0);
+            } else {
+                fireworks[i].x += fireworks[i].step_x;
+                fireworks[i].y += fireworks[i].step_y;
+                fireworks[i].step_y += fireworks[i].accel_y;
+                fireworks[i].accel_y -= GRAVITY;
+                // Alternate between the two firework tiles for animation
+                gfx_sprite *sprite = &sprites[fireworks[i].sprite_index];
+                //sprite->tile = TILE_FIREWORK+TILE_FIREWORK_2-sprite->tile;
+                sprite->x = fireworks[i].x;
+                sprite->y = fireworks[i].y;
+                if(fireworks[i].x >= 128+160 || fireworks[i].y >= 128) {
+                    // Reset the firework if it goes out of bounds
+                    sprite->x = 0;
+                    sprite->y = 0;
+                    sprite->tile = 0;
+                    fireworks[i].step_x = 0;
+                    fireworks[i].step_y = 0;
+                    fireworks[i].accel_y = 0;
+                    fireworks[i].sprite_index = 255;
+                }
+            }
+        }
+    }
 }
 
 void game_reset(void)
@@ -314,6 +403,8 @@ void game_reset(void)
     memset(letter_available, 1, sizeof(letter_available));
     letter_count = 0;
     cursor = 0;
+    unsolved_count = 0;
+    won = false;
     next_sprite = 0;
     memset(sprites, 0, sizeof(sprites));
     memset(animated_letter, 0xFF, sizeof(animated_letter)); // Mark all animated letters as inactive
@@ -355,6 +446,10 @@ void game_reset(void)
     // Clear solution tiles
     for(uint8_t y=5;y<13;y++) {
         gfx_tilemap_load(&ctx,line,40,1,0,y);
+    }
+    // Trigger fireworks or any other celebration for solving the puzzle
+    for(uint8_t i = 0; i < FIREWORK_COUNT; i++) {
+        fireworks[i].sprite_index = 255; // Mark all fireworks as inactive initially
     }
 }
 
