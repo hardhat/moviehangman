@@ -184,7 +184,10 @@ void show_movie(void)
     for(active_line=0;active_line<line_count;active_line++) {
         for(uint8_t letter=0;letter<line[active_line];letter++) {
             // Update clue structure and draw the clue tile.
-            if(phrase[line_start[active_line] + letter] == ' ') continue;
+            if(phrase[line_start[active_line] + letter] == ' ') {
+                left += 3;
+                continue;
+            }
             clue[clue_count].letter = phrase[line_start[active_line] + letter];
             clue[clue_count].sprite_index = 255; // unsolved
             clue[clue_count].x = left;
