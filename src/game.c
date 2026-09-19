@@ -424,6 +424,10 @@ void game_reset(void)
     cursor = 0;
     unsolved_count = 0;
     won = false;
+    for(uint8_t i = 0; i < FIREWORK_COUNT; i++) {
+        fireworks[i].sprite_index = 255; // Mark all fireworks as inactive initially
+        fireworks[i].delay = (rand() & 63) + 5; // Random delay before the firework starts moving
+    }
     next_sprite = 0;
     memset(sprites, 0, sizeof(sprites));
     memset(animated_letter, 0xFF, sizeof(animated_letter)); // Mark all animated letters as inactive
@@ -463,7 +467,7 @@ void game_reset(void)
     }
     uint8_t line[40]={0};
     // Clear solution tiles
-    for(uint8_t y=5;y<13;y++) {
+    for(uint8_t y=5;y<14;y++) {
         gfx_tilemap_load(&ctx,line,40,1,0,y);
     }
     // Trigger fireworks or any other celebration for solving the puzzle
