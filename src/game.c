@@ -44,7 +44,7 @@ struct Fireworks {
     uint16_t x, y;          // In pixels, the position of the firework.
     int16_t step_x, step_y; // The velocity of the firework.
     int8_t accel_y;       // The acceleration in the y direction.
-    uint8_t lifetime;       // The remaining lifetime of the firework.
+    uint8_t delay;       // The remaining lifetime of the firework.
 } fireworks[FIREWORK_COUNT]; // Array to hold multiple fireworks, adjust the size as needed.
 
 uint8_t add_sprite(uint8_t tile, uint16_t x, uint16_t y,uint8_t flags)
@@ -380,7 +380,7 @@ void game_update(uint16_t delta)
     if(won) {
         // Update fireworks for celebration
         for(uint8_t i = 0; i < FIREWORK_COUNT; i++) {
-            if( fireworks[i].sprite_index == 255) {
+            if( fireworks[i].sprite_index == 255 && fireworks[i].delay == 0) {
                 fireworks[i].x = ((rand()>>6)&511) + 320-256; // Random x position for the firework
                 fireworks[i].y = (rand()>>8) % 128; // Random y position for the firework
                 fireworks[i].step_x = (rand() % 9) - 4; // Random horizontal step for the firework
@@ -388,7 +388,7 @@ void game_update(uint16_t delta)
                 fireworks[i].accel_y = FIREWORK_INITIAL_ACCEL_Y; // Initial acceleration in the y direction
                 uint8_t tile = (rand() & 1) ? TILE_FIREWORK : TILE_FIREWORK_2;
                 fireworks[i].sprite_index = find_sprite(tile, fireworks[i].x, fireworks[i].y, rand()&6);
-            } else {
+            } else if(fireworks[i].delay == 0) {
                 fireworks[i].x += fireworks[i].step_x;
                 fireworks[i].y += fireworks[i].step_y;
                 fireworks[i].step_y += fireworks[i].accel_y;
@@ -407,7 +407,10 @@ void game_update(uint16_t delta)
                     fireworks[i].step_y = 0;
                     fireworks[i].accel_y = 0;
                     fireworks[i].sprite_index = 255;
+                    fireworks[i].delay = (rand() & 63) + 5; // Random delay before the firework starts moving
                 }
+            } else {
+                fireworks[i].delay--;
             }
         }
     }
