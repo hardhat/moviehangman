@@ -38,12 +38,12 @@ struct AnimatedLetter {
 int random_seed=0;
 #define FIREWORK_COUNT 32
 #define GRAVITY 1
-#define FIREWORK_INITIAL_ACCEL_Y 8
+#define FIREWORK_INITIAL_ACCEL_Y -5
 struct Fireworks {
     uint8_t sprite_index;   // The sprite index of the firework or 255 if inactive.
     uint16_t x, y;          // In pixels, the position of the firework.
     int16_t step_x, step_y; // The velocity of the firework.
-    uint8_t accel_y;       // The acceleration in the y direction.
+    int8_t accel_y;       // The acceleration in the y direction.
     uint8_t lifetime;       // The remaining lifetime of the firework.
 } fireworks[FIREWORK_COUNT]; // Array to hold multiple fireworks, adjust the size as needed.
 
@@ -369,9 +369,9 @@ void game_update(uint16_t delta)
         // Update fireworks for celebration
         for(uint8_t i = 0; i < FIREWORK_COUNT; i++) {
             if( fireworks[i].sprite_index == 255) {
-                fireworks[i].x = ((rand()>>7)&511) + 320-256; // Random x position for the firework
+                fireworks[i].x = ((rand()>>6)&511) + 320-256; // Random x position for the firework
                 fireworks[i].y = (rand()>>8) % 128; // Random y position for the firework
-                fireworks[i].step_x = (rand() % 3) - 1; // Random horizontal step for the firework
+                fireworks[i].step_x = (rand() % 9) - 4; // Random horizontal step for the firework
                 fireworks[i].step_y = 1; // Random vertical step for the firework
                 fireworks[i].accel_y = FIREWORK_INITIAL_ACCEL_Y; // Initial acceleration in the y direction
                 uint8_t tile = (rand() & 1) ? TILE_FIREWORK : TILE_FIREWORK_2;
@@ -380,13 +380,13 @@ void game_update(uint16_t delta)
                 fireworks[i].x += fireworks[i].step_x;
                 fireworks[i].y += fireworks[i].step_y;
                 fireworks[i].step_y += fireworks[i].accel_y;
-                fireworks[i].accel_y -= GRAVITY;
+                fireworks[i].accel_y += GRAVITY;
                 // Alternate between the two firework tiles for animation
                 gfx_sprite *sprite = &sprites[fireworks[i].sprite_index];
                 //sprite->tile = TILE_FIREWORK+TILE_FIREWORK_2-sprite->tile;
                 sprite->x = fireworks[i].x;
                 sprite->y = fireworks[i].y;
-                if(fireworks[i].x >= 640 || fireworks[i].y >= 256) {
+                if(fireworks[i].x >= 640 || (fireworks[i].y >= 290 && fireworks[i].y <1024)) {
                     // Reset the firework if it goes out of bounds
                     sprite->x = 0;
                     sprite->y = 0;
