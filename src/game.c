@@ -145,10 +145,14 @@ void show_movie(void)
 
     uint8_t word_start=0; // Start index of the word currently being scanned.
     uint8_t cur_len=0;    // Length of content accumulated on the current line so far.
+    uint8_t letters_present=0;  // Number of letters in the phrase.
+    uint8_t numbers_present=0;  // Number of numbers in the phrase.
 
     // Walk the phrase a word at a time (a word ends at a space or the end of the string),
     // only wrapping to a new line when the word being added would overflow the current one.
     for(uint8_t i=0;i<=len;i++) {
+        if(phrase[i] >= 'A' && phrase[i] <= 'Z') letters_present++;
+        if(phrase[i] >= '0' && phrase[i] <= '9') numbers_present++;
         if(i==len || phrase[i]==' ') {
             uint8_t word_len=i-word_start;
             uint8_t sep=(cur_len>0)?1:0; // space needed before this word if the line isn't empty
@@ -212,6 +216,14 @@ void show_movie(void)
     for(int i=0;i<AVAILABLE_CHARACTER_COUNT;i++) {
         if(i!=cursor) {
             draw_available_letter_tile(i, letter_available[i]?TILE_AVAILABLE_LETTER:TILE_USED_LETTER);
+        }
+        if(i<26 && !letters_present) {
+            letter_available[i] = 0;
+            draw_available_letter_tile(i, TILE_USED_LETTER);
+        }
+        if(i>=26 && !numbers_present) {
+            letter_available[i] = 0;
+            draw_available_letter_tile(i, TILE_USED_LETTER);
         }
     }
 
