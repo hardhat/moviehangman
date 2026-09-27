@@ -20,6 +20,11 @@ enum INPUT
     INPUT_SELECT,
     INPUT_L,
     INPUT_R,
+    INPUT_1,
+    INPUT_2,
+    INPUT_3,
+    INPUT_4,
+    INPUT_5,
     MAX_INPUT
 };
 

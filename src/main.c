@@ -14,13 +14,14 @@
 #include <zos_errors.h>
 #include <zos_vfs.h>
 #include <zos_video.h>
+#include <zos_time.h>
 #include <zvb_gfx.h>
 #include <zvb_sound.h>
-//#include <zvb_timer.h>
 
 #include "main.h"
 #include "img.h"
 #include "game.h"
+#include "sound.h"
 
 #ifndef __SDCC_VERSION_MAJOR
 #define __at(addr)
@@ -119,6 +120,16 @@ uint8_t handle_input(uint8_t key)
         case KB_ESC:
             done = true;
             return MAX_INPUT;
+        case KB_KEY_1:
+            return INPUT_1;
+        case KB_KEY_2:
+            return INPUT_2;
+        case KB_KEY_3:
+            return INPUT_3;
+        case KB_KEY_4:
+            return INPUT_4;
+        case KB_KEY_5:
+            return INPUT_5;
         case KB_KEY_W:
         case KB_UP_ARROW:
         case KB_NUMPAD_8:
@@ -204,6 +215,7 @@ int main(int argc, char *argv[])
     void* arg = (void*) (KB_READ_NON_BLOCK | KB_MODE_RAW);
     ioctl(DEV_STDIN, KB_CMD_SET_MODE, arg);
 
+    sound_init();
     game_reset();
     // Set the initial time to 0
     zos_time_t delta;
@@ -214,16 +226,18 @@ int main(int argc, char *argv[])
         // Poll the keyboard for input
         gfx_wait_end_vblank(&ctx);
         process_input();
-        //gettime(0,&delta);
-        uint16_t elapsed = 16; //delta.t_millis;
-        //if(elapsed==0) elapsed=16;
-        //delta.t_millis = 0; // Reset the delta time for the next frame
-        //settime(0,&delta);
+        gettime(0,&delta);
+        uint16_t elapsed = delta.t_millis;
+        if(elapsed==0) elapsed=16;
+        delta.t_millis = 0; // Reset the delta time for the next frame
+        settime(0,&delta);
+        sound_update(elapsed);
         game_update(elapsed); // Use the actual elapsed time since the last frame
         gfx_wait_vblank(&ctx);
         game_draw();
     }
 
+    sound_term();
     zvb_sound_reset();
     memset(sprites, 0, sizeof(sprites));
     gfx_sprite_render_array(&ctx, 0, sprites, 128);

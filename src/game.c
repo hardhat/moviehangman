@@ -5,6 +5,7 @@
 #include <zvb_gfx.h>
 
 #include "main.h"
+#include "sound.h"
 #include "movies.h"
 #include "game.h"
 
@@ -286,6 +287,7 @@ void animate_clue_tile_solution(struct Clue *clue_tile)
 
 void game_handle_input(uint8_t input, bool pressed)
 {
+    bool letter_matched = false;
     if(phrase[0]==0 || (input==INPUT_START && !pressed)) {
         if(phrase[0]==0) {
             srand(random_seed);
@@ -303,22 +305,33 @@ void game_handle_input(uint8_t input, bool pressed)
         draw_available_letter_tile(cursor, TILE_SELECTED_LETTER);
         return;
     }
+
+    if(pressed && input >= INPUT_1 && input <= INPUT_5) {
+        debug_logf("sfx %d", input - INPUT_1 + 1);
+        sound_play(input - INPUT_1 + 1);
+        return;
+    }
+
     if(input==INPUT_LEFT && pressed)  {
         draw_available_letter_tile(cursor,  letter_available[cursor]?TILE_AVAILABLE_LETTER:TILE_USED_LETTER);
         cursor=(AVAILABLE_CHARACTER_COUNT+cursor-1)%AVAILABLE_CHARACTER_COUNT;
         draw_available_letter_tile(cursor, letter_available[cursor]?TILE_SELECTED_LETTER:TILE_SELECTED_USED_LETTER);
+        sound_play(SOUND_MOVE_CURSOR);
     } else if(input==INPUT_RIGHT && pressed) {
         draw_available_letter_tile(cursor,  letter_available[cursor]?TILE_AVAILABLE_LETTER:TILE_USED_LETTER);
         cursor=(cursor+1)%AVAILABLE_CHARACTER_COUNT;
         draw_available_letter_tile(cursor, letter_available[cursor]?TILE_SELECTED_LETTER:TILE_SELECTED_USED_LETTER);
+        sound_play(SOUND_MOVE_CURSOR);
     } else if(input==INPUT_UP && pressed) {
         draw_available_letter_tile(cursor,  letter_available[cursor]?TILE_AVAILABLE_LETTER:TILE_USED_LETTER);
         cursor=(AVAILABLE_CHARACTER_COUNT+cursor-AVAILABLE_CHARACTER_COLUMNS)%AVAILABLE_CHARACTER_COUNT;
         draw_available_letter_tile(cursor, letter_available[cursor]?TILE_SELECTED_LETTER:TILE_SELECTED_USED_LETTER);
+        sound_play(SOUND_MOVE_CURSOR);
     } else if(input==INPUT_DOWN && pressed) {
         draw_available_letter_tile(cursor,  letter_available[cursor]?TILE_AVAILABLE_LETTER:TILE_USED_LETTER);
         cursor=(cursor+AVAILABLE_CHARACTER_COLUMNS)%AVAILABLE_CHARACTER_COUNT;
         draw_available_letter_tile(cursor, letter_available[cursor]?TILE_SELECTED_LETTER:TILE_SELECTED_USED_LETTER);
+        sound_play(SOUND_MOVE_CURSOR);
     } else if (input==INPUT_A && pressed) {
         // Handle selecting the current letter
         if(letter_available[cursor]) {
@@ -330,6 +343,7 @@ void game_handle_input(uint8_t input, bool pressed)
             for(uint8_t i = 0; i < clue_count; i++) {
                 if(clue[i].letter == available_character(cursor)) {
                     animate_clue_tile_solution(&clue[i]);
+                    letter_matched = true;
                 } else if(clue[i].letter != 0 && letter_available[character_index(clue[i].letter)]) {
                     unsolved_count++;
                     //debug_logf("Letter %d:%c is still unsolved.", i, clue[i].letter);
@@ -338,11 +352,16 @@ void game_handle_input(uint8_t input, bool pressed)
             //debug_logf("Unsolved count: %d", unsolved_count);
             if(unsolved_count == 0) {
                 won = true;
+                sound_play(SOUND_PHRASE_COMPLETE);
                 //debug_log("You won!");
+            } else if(!letter_matched) {
+                sound_play(SOUND_LETTER_INCORRECT);
+            } else {
+                sound_play(SOUND_LETTER_CORRECT);
             }
+
         }
     }
-    
 }
 
 // Update the game state based on the elapsed time in ms (delta).
@@ -418,6 +437,7 @@ void game_update(uint16_t delta)
 
 void game_reset(void)
 {
+    sound_play(SOUND_STARTUP);
     memset(phrase, 0, sizeof(phrase));
     memset(letter_available, 1, sizeof(letter_available));
     letter_count = 0;
