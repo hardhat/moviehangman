@@ -17,13 +17,43 @@ typedef struct Song {
 
 #define NOTE(frequency, duration, volume) \
     {SOUND_FREQ_TO_DIV(frequency), duration, volume}
+#define REST(duration) {0, duration, VOL_0}
 #define NOTE_COUNT(notes) (sizeof(notes) / sizeof((notes)[0]))
 
 static const Note startup_notes[] = {
-    NOTE(FREQ_C4, 90, VOL_75),
-    NOTE(FREQ_E5, 90, VOL_75),
-    NOTE(FREQ_G5, 110, VOL_100),
-    NOTE(FREQ_C6, 220, VOL_100),
+    // Syncopated walking bass: each phrase is 640 ms on a 32 ms grid.
+    // Cmaj (C-E-G-C)
+    NOTE(FREQ_C3, 128, VOL_75),
+    REST(64),
+    NOTE(FREQ_E3, 64, VOL_75),
+    REST(32),
+    NOTE(FREQ_G3, 128, VOL_100),
+    REST(32),
+    NOTE(FREQ_C3, 192, VOL_100),
+    // Emin (E-G-B-E)
+    NOTE(FREQ_E3, 128, VOL_75),
+    REST(64),
+    NOTE(FREQ_G3, 64, VOL_75),
+    REST(32),
+    NOTE(FREQ_B3, 128, VOL_100),
+    REST(32),
+    NOTE(FREQ_E3, 192, VOL_100),
+    // Gmaj (G-B-D-G)
+    NOTE(FREQ_G3, 128, VOL_75),
+    REST(64),
+    NOTE(FREQ_B3, 64, VOL_75),
+    REST(32),
+    NOTE(FREQ_D4, 128, VOL_100),
+    REST(32),
+    NOTE(FREQ_G3, 192, VOL_100),
+    // Cmaj (C-E-G-C)
+    NOTE(FREQ_C3, 128, VOL_75),
+    REST(64),
+    NOTE(FREQ_E3, 64, VOL_75),
+    REST(32),
+    NOTE(FREQ_G3, 128, VOL_100),
+    REST(32),
+    NOTE(FREQ_C3, 192, VOL_100),
 };
 
 static const Note letter_correct_notes[] = {
@@ -37,11 +67,32 @@ static const Note letter_incorrect_notes[] = {
 };
 
 static const Note phrase_complete_notes[] = {
-    NOTE(FREQ_C4, 90, VOL_75),
-    NOTE(FREQ_E5, 90, VOL_75),
-    NOTE(FREQ_G5, 90, VOL_100),
-    NOTE(FREQ_C6, 180, VOL_100),
-    NOTE(FREQ_E6, 260, VOL_100),
+    // Two rising brass calls followed by a high answering flourish (1424 ms).
+    NOTE(FREQ_G4, 80, VOL_75),
+    REST(16),
+    NOTE(FREQ_C5, 80, VOL_100),
+    REST(16),
+    NOTE(FREQ_E5, 80, VOL_100),
+    REST(16),
+    NOTE(FREQ_G5, 144, VOL_100),
+    REST(32),
+
+    NOTE(FREQ_C5, 80, VOL_75),
+    REST(16),
+    NOTE(FREQ_E5, 80, VOL_100),
+    REST(16),
+    NOTE(FREQ_G5, 80, VOL_100),
+    REST(16),
+    NOTE(FREQ_C6, 144, VOL_100),
+    REST(32),
+
+    NOTE(FREQ_G5, 96, VOL_75),
+    REST(16),
+    NOTE(FREQ_C6, 96, VOL_100),
+    REST(16),
+    NOTE(FREQ_E6, 96, VOL_100),
+    REST(16),
+    NOTE(FREQ_G6, 160, VOL_100),
 };
 
 static const Note game_over_notes[] = {
@@ -52,15 +103,19 @@ static const Note game_over_notes[] = {
 };
 
 static const Note move_cursor_notes[] = {
-    NOTE(FREQ_C5, 50, VOL_75),
+    NOTE(FREQ_C5, 16, VOL_75),
+    NOTE(FREQ_C5, 16, VOL_100),
+    NOTE(FREQ_C5, 16, VOL_75),
+    NOTE(FREQ_C5, 16, VOL_50),
+    NOTE(FREQ_C5, 16, VOL_25),
 };
 
 static const Song songs[] = {
     {WAV_SQUARE, NULL, 0},
-    {WAV_SQUARE | DUTY_CYCLE_50_0, startup_notes, NOTE_COUNT(startup_notes)},
-    {WAV_TRIANGLE, letter_correct_notes, NOTE_COUNT(letter_correct_notes)},
+    {WAV_TRIANGLE, startup_notes, NOTE_COUNT(startup_notes)},
+    {WAV_SQUARE | DUTY_CYCLE_50_0, letter_correct_notes, NOTE_COUNT(letter_correct_notes)},
     {WAV_SAWTOOTH, letter_incorrect_notes, NOTE_COUNT(letter_incorrect_notes)},
-    {WAV_SQUARE | DUTY_CYCLE_50_0, phrase_complete_notes, NOTE_COUNT(phrase_complete_notes)},
+    {WAV_SAWTOOTH, phrase_complete_notes, NOTE_COUNT(phrase_complete_notes)},
     {WAV_TRIANGLE, game_over_notes, NOTE_COUNT(game_over_notes)},
     {WAV_TRIANGLE, move_cursor_notes, NOTE_COUNT(move_cursor_notes)},
 };
