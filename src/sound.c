@@ -18,42 +18,52 @@ typedef struct Song {
 #define NOTE(frequency, duration, volume) \
     {SOUND_FREQ_TO_DIV(frequency), duration, volume}
 #define REST(duration) {0, duration, VOL_0}
+#define FADE_NOTE(frequency) \
+    NOTE(frequency, 96, VOL_100), \
+    NOTE(frequency, 80, VOL_75), \
+    NOTE(frequency, 80, VOL_50), \
+    NOTE(frequency, 80, VOL_25)
 #define NOTE_COUNT(notes) (sizeof(notes) / sizeof((notes)[0]))
 
 static const Note startup_notes[] = {
-    // Syncopated walking bass: each phrase is 640 ms on a 32 ms grid.
-    // Cmaj (C-E-G-C)
-    NOTE(FREQ_C3, 128, VOL_75),
-    REST(64),
-    NOTE(FREQ_E3, 64, VOL_75),
-    REST(32),
-    NOTE(FREQ_G3, 128, VOL_100),
-    REST(32),
-    NOTE(FREQ_C3, 192, VOL_100),
-    // Emin (E-G-B-E)
-    NOTE(FREQ_E3, 128, VOL_75),
-    REST(64),
-    NOTE(FREQ_G3, 64, VOL_75),
-    REST(32),
-    NOTE(FREQ_B3, 128, VOL_100),
-    REST(32),
-    NOTE(FREQ_E3, 192, VOL_100),
-    // Gmaj (G-B-D-G)
-    NOTE(FREQ_G3, 128, VOL_75),
-    REST(64),
-    NOTE(FREQ_B3, 64, VOL_75),
-    REST(32),
-    NOTE(FREQ_D4, 128, VOL_100),
-    REST(32),
-    NOTE(FREQ_G3, 192, VOL_100),
-    // Cmaj (C-E-G-C)
-    NOTE(FREQ_C3, 128, VOL_75),
-    REST(64),
-    NOTE(FREQ_E3, 64, VOL_75),
-    REST(32),
-    NOTE(FREQ_G3, 128, VOL_100),
-    REST(32),
-    NOTE(FREQ_C3, 192, VOL_100),
+    // Opening bass riff: eighth notes are 384 ms; quarter rests are 768 ms.
+    // E E, rest, E E, rest
+    FADE_NOTE(FREQ_E3),
+    REST(48),
+    FADE_NOTE(FREQ_E3),
+    REST(816),
+    FADE_NOTE(FREQ_E3),
+    REST(48),
+    FADE_NOTE(FREQ_E3),
+    REST(816),
+
+    // A A, rest, B B, rest
+    FADE_NOTE(FREQ_A3),
+    REST(48),
+    FADE_NOTE(FREQ_A3),
+    REST(816),
+    FADE_NOTE(FREQ_B3),
+    REST(48),
+    FADE_NOTE(FREQ_B3),
+    REST(816),
+
+    // E E, rest, E E, rest
+    FADE_NOTE(FREQ_E3),
+    REST(48),
+    FADE_NOTE(FREQ_E3),
+    REST(816),
+    FADE_NOTE(FREQ_E3),
+    REST(48),
+    FADE_NOTE(FREQ_E3),
+    REST(816),
+
+    // 3/4 ending: A A, rest, B, eighth rest
+    FADE_NOTE(FREQ_A3),
+    REST(48),
+    FADE_NOTE(FREQ_A3),
+    REST(816),
+    FADE_NOTE(FREQ_B3),
+    REST(432),
 };
 
 static const Note letter_correct_notes[] = {
