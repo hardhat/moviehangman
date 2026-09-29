@@ -19,51 +19,51 @@ typedef struct Song {
     {SOUND_FREQ_TO_DIV(frequency), duration, volume}
 #define REST(duration) {0, duration, VOL_0}
 #define FADE_NOTE(frequency) \
-    NOTE(frequency, 96, VOL_100), \
-    NOTE(frequency, 80, VOL_75), \
-    NOTE(frequency, 80, VOL_50), \
-    NOTE(frequency, 80, VOL_25)
+    NOTE(frequency, 64, VOL_100), \
+    NOTE(frequency, 64, VOL_75), \
+    NOTE(frequency, 64, VOL_50), \
+    NOTE(frequency, 64, VOL_25)
 #define NOTE_COUNT(notes) (sizeof(notes) / sizeof((notes)[0]))
 
 static const Note startup_notes[] = {
-    // Opening bass riff: eighth notes are 384 ms; quarter rests are 768 ms.
+    // Opening bass riff: eighth notes are 288 ms; quarter rests are 576 ms.
     // E E, rest, E E, rest
     FADE_NOTE(FREQ_E3),
-    REST(48),
+    REST(32),
     FADE_NOTE(FREQ_E3),
-    REST(816),
+    REST(608),
     FADE_NOTE(FREQ_E3),
-    REST(48),
+    REST(32),
     FADE_NOTE(FREQ_E3),
-    REST(816),
+    REST(608),
 
     // A A, rest, B B, rest
     FADE_NOTE(FREQ_A3),
-    REST(48),
+    REST(32),
     FADE_NOTE(FREQ_A3),
-    REST(816),
+    REST(608),
     FADE_NOTE(FREQ_B3),
-    REST(48),
+    REST(32),
     FADE_NOTE(FREQ_B3),
-    REST(816),
+    REST(608),
 
     // E E, rest, E E, rest
     FADE_NOTE(FREQ_E3),
-    REST(48),
+    REST(32),
     FADE_NOTE(FREQ_E3),
-    REST(816),
+    REST(608),
     FADE_NOTE(FREQ_E3),
-    REST(48),
+    REST(32),
     FADE_NOTE(FREQ_E3),
-    REST(816),
+    REST(608),
 
     // 3/4 ending: A A, rest, B, eighth rest
     FADE_NOTE(FREQ_A3),
-    REST(48),
+    REST(32),
     FADE_NOTE(FREQ_A3),
-    REST(816),
+    REST(608),
     FADE_NOTE(FREQ_B3),
-    REST(432),
+    REST(320),
 };
 
 static const Note letter_correct_notes[] = {

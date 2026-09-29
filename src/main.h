@@ -38,8 +38,8 @@ enum TILESET_ID
     TILE_USED_LETTER = 0x21, // purple bg
     TILE_SELECTED_USED_LETTER = 0x32, // black bg but already used
     TILE_HEAD = 0x40, // head 2x2
-    TILE_LEFT_SHOE = 0x50, // left shoe 2x1
-    TILE_RIGHT_SHOE = 0x52, // right show 2x1
+    TILE_LEFT_SHOE = 0x60, // left shoe 2x1
+    TILE_RIGHT_SHOE = 0x62, // right show 2x1
     TILE_LEFT_ARM = 0x42, // left arm 2x1
     TILE_RIGHT_ARM = 0x44, // right arm 2x1
     TILE_HAND = 0x64, // hand
@@ -47,7 +47,7 @@ enum TILESET_ID
     TILE_LEFT_HIP = 0x46, // left hip
     TILE_RIGHT_HIP = 0x47, // right hip
     TILE_SHIRT = 0x24, // shirt
-    TILE_LEFT_SHOLDER = 0x52, // left shoulder
+    TILE_LEFT_SHOULDER = 0x52, // left shoulder
     TILE_RIGHT_SHOULDER = 0x53, // right shoulder
     TILE_CLUE = 0x4D, // blank clue tile 3x3
     TILE_CLUE_HIGHLIGHT = 0x1D, // highlighted clue tile 3x3

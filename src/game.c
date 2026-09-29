@@ -48,6 +48,66 @@ struct Fireworks {
     uint8_t delay;       // The remaining lifetime of the firework.
 } fireworks[FIREWORK_COUNT]; // Array to hold multiple fireworks, adjust the size as needed.
 
+// The hangman body parts for the game.
+struct Body {
+    uint8_t x,y; // Tile position of the body part.
+    uint8_t w,h; // Width and height of the body part in tiles.
+    const uint8_t *tiles; // Pointer to the tile data for the body part.
+};
+
+const uint8_t head_tiles[] = {
+    TILE_HEAD, TILE_HEAD+1,
+    TILE_HEAD+0x10, TILE_HEAD+0x11,
+};
+
+const uint8_t torso_tiles[] = {
+    TILE_SHIRT, TILE_SHIRT,
+    TILE_SHIRT, TILE_SHIRT,
+    TILE_SHIRT, TILE_SHIRT,
+};
+
+const uint8_t left_arm_tiles[] = {
+    0, TILE_LEFT_SHOULDER,
+    TILE_LEFT_ARM, TILE_LEFT_ARM+1,
+    TILE_HAND, 0
+};
+const uint8_t right_arm_tiles[] = {
+    TILE_RIGHT_SHOULDER, 0,
+    TILE_RIGHT_ARM, TILE_RIGHT_ARM+1,
+    0, TILE_HAND
+};
+const uint8_t left_leg_tiles[] = {
+    0, TILE_LEFT_HIP, TILE_LEG,
+    0, TILE_LEG, 0,
+    0, TILE_LEG, 0,
+    TILE_LEFT_SHOE, TILE_LEFT_SHOE+1, 0
+};
+const uint8_t right_leg_tiles[] = {
+    TILE_LEG, TILE_RIGHT_HIP, 0,
+    0, TILE_LEG, 0,
+    0, TILE_LEG, 0,
+    0,TILE_RIGHT_SHOE, TILE_RIGHT_SHOE+1
+};
+
+const struct Body body_parts[] = {
+    // Head
+    {34, 16, 2, 2, head_tiles},
+    // Torso
+    {34, 18, 2, 3, torso_tiles},
+    // Left Arm
+    {32, 18, 2, 3, left_arm_tiles},
+    // Right Arm
+    {36, 18, 2, 3, right_arm_tiles},
+    // Left Leg
+    {32, 21, 3, 4, left_leg_tiles},
+    // Right Leg
+    {35, 21, 3, 4, right_leg_tiles},
+};
+
+const uint8_t body_parts_count = sizeof(body_parts)/sizeof(body_parts[0]);
+uint8_t next_body_part = 0;
+uint8_t body_parts_drawn = 0;
+
 uint8_t add_sprite(uint8_t tile, uint16_t x, uint16_t y,uint8_t flags)
 {
     if(next_sprite>=128) return 255;
@@ -356,10 +416,25 @@ void game_handle_input(uint8_t input, bool pressed)
                 //debug_log("You won!");
             } else if(!letter_matched) {
                 sound_play(SOUND_LETTER_INCORRECT);
+                next_body_part++;
             } else {
                 sound_play(SOUND_LETTER_CORRECT);
             }
 
+        }
+    }
+}
+
+void draw_body_part(const struct Body* body_part)
+{
+    // Draws the body part on layer 1
+    const uint8_t *tiles = body_part->tiles;
+    for(uint8_t y = 0; y < body_part->h; y++) {
+        for(uint8_t x = 0; x < body_part->w; x++) {
+            uint8_t tile = *tiles++;
+            if(tile != 0) {
+                gfx_tilemap_place(&ctx, tile, 1, body_part->x + x, body_part->y + y);
+            }
         }
     }
 }
@@ -371,6 +446,12 @@ void game_update(uint16_t delta)
     // Seed random timer until the first phrase is set
     if(phrase[0]==0) {
         random_seed++;
+    }
+
+    if(next_body_part > body_parts_drawn && body_parts_drawn < body_parts_count) {
+        // Draw the next body part here.
+        draw_body_part(&body_parts[body_parts_drawn]);
+        body_parts_drawn++;
     }
 
     for(uint8_t i = 0; i < ANIMATED_LETTER_COUNT; i++) {
@@ -444,6 +525,8 @@ void game_reset(void)
     cursor = 0;
     unsolved_count = 0;
     won = false;
+    next_body_part = 0;
+    body_parts_drawn = 0;
     for(uint8_t i = 0; i < FIREWORK_COUNT; i++) {
         fireworks[i].sprite_index = 255; // Mark all fireworks as inactive initially
         fireworks[i].delay = (rand() & 63) + 5; // Random delay before the firework starts moving
