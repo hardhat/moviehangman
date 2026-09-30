@@ -36,7 +36,7 @@ Requires the [SDCC](http://sdcc.sourceforge.net/) toolchain and local checkouts 
 make
 ```
 
-This produces `bin/cylix.bin`, which is copied to the `s` disk image folder for use with the
+This produces `bin/hangman.bin`, which is copied to the `s` disk image folder for use with the
 Zeal 8-bit Computer or its emulator.
 
 ## Generating the movie word list
