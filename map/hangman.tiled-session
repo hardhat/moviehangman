@@ -3,10 +3,19 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "main.tmx",
     "expandedProjectPaths": [
+        "."
     ],
     "fileStates": {
+        "main.tmx": {
+            "scale": 1.153359375,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 319.9349725665515,
+                "y": 239.73447131341868
+            }
+        },
         "tileset.tsx": {
             "scaleInDock": 1
         }
@@ -18,9 +27,11 @@
     "map.tileWidth": 16,
     "map.width": 40,
     "openFiles": [
+        "main.tmx"
     ],
     "project": "hangman.tiled-project",
     "recentFiles": [
+        "main.tmx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {
